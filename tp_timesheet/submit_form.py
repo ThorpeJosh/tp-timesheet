@@ -1,16 +1,15 @@
-from selenium import webdriver
-#from selenium.webdriver.chrome.service import Service
-#from webdriver_manager.chrome import ChromeDriverManager
-from PIL import Image
-from datetime import datetime
+""" Module containing tool to submit the form """
+import os
 import time
+import datetime
+from selenium import webdriver
+from PIL import Image
 
+DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
-URL = ""
-EMAIL = "" # your email address
-DATE = datetime.now().strftime("%m/%d/%Y") 
-
-def submit_timesheet(url, email, date, debug=false):
+def submit_timesheet(url, email, date, debug=False):
+    if not isinstance(date, datetime.datetime):
+        raise TypeError(f"Date must be of type <datetime.datetime>, got {date}, of type: {type(date)}")
 
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-ssl-errors=yes')
@@ -24,7 +23,7 @@ def submit_timesheet(url, email, date, debug=false):
     browser.get(URL)
 
     # wait a bit for elements on webpage to fully load
-    browser.implicitly_wait(10)
+    browser.implicitly_wait(5)
 
     # find the email field element and fill your email
     email = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input")
@@ -32,12 +31,14 @@ def submit_timesheet(url, email, date, debug=false):
 
     # find the date field and fill date
     date = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/input[1]")
-    date.send_keys(DATE)
+    date.send_keys(date.strftime("%m/%d/%Y"))
     
     if debug:
         # Capture image of top half of submission
-        browser.save_screenshot("image_top.png")
-        image = Image.open("image_top.png")
+        image_path = os.path.join(DESKTOP_PATH, f"timesheet_top_{date.strftime('%d_%m_%Y')}.png")
+        print(f"Saving top of timesheel to: {image_path}")
+        browser.save_screenshot(image_path)
+        image = Image.open(image_path)
         image.show()
 
     # find and fill in live hours
@@ -55,17 +56,17 @@ def submit_timesheet(url, email, date, debug=false):
     # find submit button and click submit
     submit = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[3]/div[1]/button/div")
     submit.click()
-    browser.implicitly_wait(10)
+    browser.implicitly_wait(5)
 
     
     if debug:
-        # Optional steps to show screenshot of submitted page
-        browser.save_screenshot("image.png")
-        image = Image.open("image.png")
+        # Capture image of top half of submission
+        image_path = os.path.join(DESKTOP_PATH, f"timesheet_bottom_{date.strftime('%d_%m_%Y')}.png")
+        print(f"Saving bottom of timesheel to: {image_path}")
+        browser.save_screenshot(image_path)
+        image = Image.open(image_path)
         image.show()
 
     # close the browser after submitting
     browser.quit()
 
-if __name__ == "__main__":
-    run()

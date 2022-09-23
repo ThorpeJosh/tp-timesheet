@@ -2,6 +2,7 @@
 import os
 import argparse
 from tp_timesheet.docker_handler import DockerHandler
+from tp_timesheet.submit_form import submit_timesheet
 
 
 def parse_args():
@@ -40,6 +41,7 @@ def run():
         docker_handler.run_container()
 
         # TODO: Run the timesheet submissions for each date
+        # submit_timesheet(URL, EMAIL, date, args.debug)
 
     finally:
         if args.debug:
