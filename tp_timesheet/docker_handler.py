@@ -13,6 +13,7 @@ class DockerHandler:
         self.client = docker.from_env()
         self.arch = platform.machine()
         self.image = self.select_image(self.arch)
+        self.container = None
 
     @staticmethod
     def select_image(arch):
