@@ -1,2 +1,2 @@
 # tp-timesheet
-Automation submission of timesheet
+Automated submission of timesheet
