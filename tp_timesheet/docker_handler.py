@@ -2,7 +2,6 @@
 import platform
 import docker
 
-
 ARM_IMAGE = 'seleniarm/standalone-chromium:105.0'
 X86_IMAGE = 'selenium/standalone-chrome:105.0'
 

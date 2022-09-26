@@ -49,7 +49,7 @@ def run():
 
         # TODO: Run the timesheet submissions for each date
         for DATE in dates:
-        submit_timesheet(URL, EMAIL, DATE, args.debug)
+            submit_timesheet(URL, EMAIL, DATE, args.debug)
 
     finally:
         if args.debug:
