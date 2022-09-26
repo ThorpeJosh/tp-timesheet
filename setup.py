@@ -5,6 +5,8 @@ REQUIREMENTS=[
     'Pillow~=9.2',
     'selenium~=4.4',
     'docker~=6.0',
+    'croniter~=1.3',
+    'python-crontab~=2.6',
 ]
 DEV_REQUIREMENTS={"dev":
                   [
