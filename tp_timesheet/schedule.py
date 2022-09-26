@@ -51,8 +51,9 @@ class ScheduleForm:
             job.dow.parse('MON-FRI')
             assert job.is_valid()
             schedule = job.schedule(date_from=datetime.now())
-        print(f"Job has been scheduled in your crontab, the next scheduled run will be on {schedule.get_next()}.\nRun `crontab -l` to see your scheduled tasks.")
-
+        print(f"Job has been scheduled in your crontab, the next scheduled run will be on {schedule.get_next()}.")
+        print("Run `crontab -l` to see your scheduled tasks.")
+        print("Run `crontab -r` to clear all scheduled tasks.")
 
 
 
