@@ -7,9 +7,9 @@ from PIL import Image
 
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
-def submit_timesheet(URL, EMAIL, DATE, debug=False):
-    if not isinstance(DATE, datetime.date):
-        raise TypeError(f"Date must be of type <datetime.date>, got {DATE}, of type: {type(DATE)}")
+def submit_timesheet(URL, EMAIL, date, debug=False):
+    if not isinstance(date, datetime.date):
+        raise TypeError(f"Date must be of type <datetime.date>, got {date}, of type: {type(date)}")
 
     options = webdriver.ChromeOptions()
     options.add_argument('--ignore-ssl-errors=yes')
@@ -26,16 +26,16 @@ def submit_timesheet(URL, EMAIL, DATE, debug=False):
     browser.implicitly_wait(5)
 
     # find the email field element and fill your email
-    email = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input")
-    email.send_keys(EMAIL)
+    email_field = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input")
+    email_field.send_keys(EMAIL)
 
     # find the date field and fill date
-    date = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/input[1]")
-    date.send_keys(DATE.strftime("%m/%d/%Y"))
+    date_field = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/input[1]")
+    date_field.send_keys(date.strftime("%m/%d/%Y"))
     
     if debug:
         # Capture image of top half of submission
-        image_path = os.path.join(DESKTOP_PATH, f"timesheet_top_{DATE.strftime('%d_%m_%Y')}.png")
+        image_path = os.path.join(DESKTOP_PATH, f"timesheet_top_{date.strftime('%d_%m_%Y')}.png")
         print(f"Saving top of timesheet to: {image_path}")
         browser.save_screenshot(image_path)
         image = Image.open(image_path)
@@ -61,7 +61,7 @@ def submit_timesheet(URL, EMAIL, DATE, debug=False):
     
     if debug:
         # Capture image of top half of submission
-        image_path = os.path.join(DESKTOP_PATH, f"timesheet_bottom_{DATE.strftime('%d_%m_%Y')}.png")
+        image_path = os.path.join(DESKTOP_PATH, f"timesheet_bottom_{date.strftime('%d_%m_%Y')}.png")
         print(f"Saving bottom of timesheet to: {image_path}")
         browser.save_screenshot(image_path)
         image = Image.open(image_path)
