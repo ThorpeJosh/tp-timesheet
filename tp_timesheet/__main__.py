@@ -33,7 +33,7 @@ def run():
     else:
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
     dates = date_fn(start = start_date, count = args.count)
-    print("Date(s) to be submitted (YYYY-mm-dd):", [str(d) for d in dates])
+    print("Date(s) to be submitted (YYYY-mm-dd):", [str(date) for date in dates])
     
 
 
@@ -47,8 +47,8 @@ def run():
             print('Launching docker container for selenium backend')
         docker_handler.run_container()
 
-        # TODO: Run the timesheet submissions for each date
-        # submit_timesheet(URL, EMAIL, date, args.debug)
+        for date in dates:
+            submit_timesheet(URL, EMAIL, date, args.debug)
 
     finally:
         if args.debug:
