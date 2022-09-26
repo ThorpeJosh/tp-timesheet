@@ -1,11 +1,6 @@
-from datetime import date, timedelta
-# from tp_timesheet import DATE
+from datetime import timedelta
 
 def date_fn(start, count):
-   # if count:
-   #    delta = count
-   # else:
-   #    delta= 1
    dates = []
 
    for i in range(count):
