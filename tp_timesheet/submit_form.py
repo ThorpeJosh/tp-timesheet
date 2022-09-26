@@ -36,7 +36,7 @@ def submit_timesheet(URL, EMAIL, DATE, debug=False):
     if debug:
         # Capture image of top half of submission
         image_path = os.path.join(DESKTOP_PATH, f"timesheet_top_{DATE.strftime('%d_%m_%Y')}.png")
-        print(f"Saving top of timesheel to: {image_path}")
+        print(f"Saving top of timesheet to: {image_path}")
         browser.save_screenshot(image_path)
         image = Image.open(image_path)
         image.show()
@@ -62,7 +62,7 @@ def submit_timesheet(URL, EMAIL, DATE, debug=False):
     if debug:
         # Capture image of top half of submission
         image_path = os.path.join(DESKTOP_PATH, f"timesheet_bottom_{DATE.strftime('%d_%m_%Y')}.png")
-        print(f"Saving bottom of timesheel to: {image_path}")
+        print(f"Saving bottom of timesheet to: {image_path}")
         browser.save_screenshot(image_path)
         image = Image.open(image_path)
         image.show()
