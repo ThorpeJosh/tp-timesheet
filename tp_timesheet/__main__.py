@@ -3,6 +3,8 @@ import os
 import argparse
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
+from tp_timesheet.dates import date_fn
+from datetime import datetime
 
 
 def parse_args():
@@ -23,11 +25,16 @@ def run():
     if URL is None: 
         raise ValueError("URL is not set, please run `export TPURL='<URL OF TIMESHEET>'")
     if EMAIL is None:
-        raise ValueError("EMAIL is not set, please run `export TPMAIL='<TP EMAIL ADDR>'")
+        raise ValueError("EMAIL is not set, please run `export TPEMAIL='<TP EMAIL ADDR>'")
 
     args = parse_args()
-
-    # TODO: Calculate Dates
+    if args.start.lower() == "today":
+        start_date = datetime.today()
+    else:
+        start_date = datetime.strptime(args.start, "%d/%m/%Y")
+    dates = date_fn(start = start_date, count = args.count)
+    print("Date(s) to be submitted (YYYY-mm-dd):", [str(d) for d in dates])
+    
 
 
 
