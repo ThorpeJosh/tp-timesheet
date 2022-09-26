@@ -11,8 +11,8 @@ pip install tp-timesheet
 Then setup the URL and EMAIL to use for the timesheet submission by running the following:
 
 ``` bash
-export TPMAIL='<TP EMAIL ADDR>'
-export TPURL='<URL OF TIMESHEET>'
+export TP_EMAIL='<TP EMAIL ADDR>'
+export TP_URL='<URL OF TIMESHEET>'
 
 # Add these to your ~/*.rc for this to be persistent
 ```

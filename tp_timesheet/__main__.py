@@ -20,12 +20,12 @@ def parse_args():
 
 def run():
     """Entry point"""
-    URL = os.getenv('TPURL')
-    EMAIL = os.getenv('TPEMAIL')
+    URL = os.getenv('TP_URL')
+    EMAIL = os.getenv('TP_EMAIL')
     if URL is None: 
-        raise ValueError("URL is not set, please run `export TPURL='<URL OF TIMESHEET>'")
+        raise ValueError("URL is not set, please run `export TP_URL='<URL OF TIMESHEET>'")
     if EMAIL is None:
-        raise ValueError("EMAIL is not set, please run `export TPEMAIL='<TP EMAIL ADDR>'")
+        raise ValueError("EMAIL is not set, please run `export TP_EMAIL='<TP EMAIL ADDR>'")
 
     args = parse_args()
     if args.start.lower() == "today":
