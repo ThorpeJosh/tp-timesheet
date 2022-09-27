@@ -4,14 +4,18 @@ import argparse
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.dates import date_fn
+from tp_timesheet.schedule import ScheduleForm
 from datetime import datetime
 
 
 def parse_args():
     """Parse arguments from the command line"""
     parser = argparse.ArgumentParser(description='TP Automated Timesheet Submission - CLI Tool')
-    parser.add_argument('-s', '--start', type=str, required=True,
-                        help="First date to submit a timesheet for, dd/mm/yy or 'today'")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-s', '--start', type=str,
+                        help="Normal mode: Indicating first date to submit a timesheet. Accepted arguments = ['dd/mm/yy' ,today]")
+    group.add_argument('-a', '--automate', type=str,
+                        help="Automate mode: Schedules the form submission to run automatically. Accepted arguments = [weekdays]")
     parser.add_argument('-c', '--count', type=int, required=False, default=1,
                         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week")
     parser.add_argument('-d', '--debug', action='store_true',
@@ -28,15 +32,23 @@ def run():
         raise ValueError("EMAIL is not set, please run `export TP_EMAIL='<TP EMAIL ADDR>'")
 
     args = parse_args()
+    # Automate Mode
+    if args.automate is not None:
+        valid_options = ['weekdays']
+        if args.automate not in valid_options:
+            print(f"'{args.automate}' is not a valid option for --automate mode")
+            return
+        scheduler = ScheduleForm()
+        scheduler.schedule()
+        return
+
+    # Normal Mode
     if args.start.lower() == "today":
         start_date = datetime.today()
     else:
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
     dates = date_fn(start = start_date, count = args.count)
     print("Date(s) to be submitted (YYYY-mm-dd):", [str(date) for date in dates])
-    
-
-
 
     docker_handler = DockerHandler()
     try:
