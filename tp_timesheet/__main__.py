@@ -6,6 +6,7 @@ from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.dates import date_fn
 from tp_timesheet.schedule import ScheduleForm
 from datetime import datetime
+from workalendar.asia import Singapore
 
 
 def parse_args():
@@ -43,11 +44,12 @@ def run():
         return
 
     # Normal Mode
+    cal = Singapore()
     if args.start.lower() == "today":
         start_date = datetime.today()
     else:
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
-    dates = date_fn(start = start_date, count = args.count)
+    dates = date_fn(start = start_date, count = args.count, cal = cal)
     print("Date(s) to be submitted (YYYY-mm-dd):", [str(date) for date in dates])
 
     docker_handler = DockerHandler()
