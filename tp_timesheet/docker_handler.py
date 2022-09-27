@@ -41,7 +41,6 @@ class DockerHandler:
                 if urllib.request.urlopen("http://localhost:4444/").getcode() == 200:
                     break
             except (http.client.RemoteDisconnected, urllib.error.URLError):
-                print("#", i)
                 pass
             if i == 4:
                 raise RuntimeError("Selenium Docker API did not return a 200 code within 5 seconds")
