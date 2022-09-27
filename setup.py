@@ -7,6 +7,7 @@ REQUIREMENTS=[
     'docker~=6.0',
     'croniter~=1.3',
     'python-crontab~=2.6',
+    'workalendar~=16.4.0',
 ]
 DEV_REQUIREMENTS={"dev":
                   [
