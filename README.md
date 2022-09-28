@@ -38,7 +38,8 @@ tp-timesheet --start '3/10/22' --count 5
 # Schedule the form to submit automatically on weekdays
 tp-timesheet --automate weekdays
 
-# append '--debug' to any command to get more log messages about what is going on
+# append '--verbose' to any command to get more log messages about what is going on
+# append '--dry-run' to any command to avoid clicking submit. Good for testing
 ```
 
 ## Development
