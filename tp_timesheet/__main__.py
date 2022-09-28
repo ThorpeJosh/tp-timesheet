@@ -69,8 +69,9 @@ def run():
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == 'darwin':
-            notification_text = 'Timesheet for today is successfully submitted.'
-            if len(dates) != 1:
+            if len(dates) == 1:
+                notification_text = f'Timesheet for {args.start.lower()} is successfully submitted.'
+            else:
                 notification_text = 'Timesheets from {} to {} are successfully submitted.'.format(dates[0], dates[-1])
             os.system("""osascript -e 'display notification "{}" with title "TP Timesheet"'""".format(notification_text))
 
