@@ -19,8 +19,10 @@ def parse_args():
                         help="Automate mode: Schedules the form submission to run automatically. Accepted arguments = [weekdays]")
     parser.add_argument('-c', '--count', type=int, required=False, default=1,
                         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week")
+    parser.add_argument('-n', '--notification', action='store_true',
+                        help='Notification feature, notification will be shown when the timesheet submission is done(for OSX only)')
     parser.add_argument('-d', '--debug', action='store_true',
-                      help='Debug mode, saves screenshots of the timesheet submission page to your desktop')
+                        help='Debug mode, saves screenshots of the timesheet submission page to your desktop')
     return parser.parse_args()
 
 def run():
@@ -63,6 +65,13 @@ def run():
 
         for date in dates:
             submit_timesheet(URL, EMAIL, date, args.debug)
+
+        # Notification (OSX only)
+        if args.notification and sys.platform.lower() == 'darwin':
+            notification_text = 'Timesheet for today is successfully submitted.'
+            if len(dates) != 1:
+                notification_text = 'Timesheets from {} to {} are successfully submitted.'.format(dates[0], dates[-1])
+            os.system("""osascript -e 'display notification "{}" with title "TP_timesheet"'""".format(notification_text))
 
     finally:
         if args.debug:
