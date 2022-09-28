@@ -1,5 +1,6 @@
 """ Entry point for cli """
 import os
+import sys
 import argparse
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
@@ -19,6 +20,8 @@ def parse_args():
                         help="Automate mode: Schedules the form submission to run automatically. Accepted arguments = [weekdays]")
     parser.add_argument('-c', '--count', type=int, required=False, default=1,
                         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week")
+    parser.add_argument('-n', '--notification', action='store_true',
+                        help='Notification feature, notification will be shown when the timesheet submission is done(for OSX only)')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Verbose mode, prints logs and saves screenshots of the timesheet submission page to your desktop')
     parser.add_argument('-d', '--dry-run', action='store_true',
@@ -65,6 +68,14 @@ def run():
 
         for date in dates:
             submit_timesheet(URL, EMAIL, date, verbose=args.verbose, dry_run=args.dry_run)
+
+        # Notification (OSX only)
+        if args.notification and sys.platform.lower() == 'darwin':
+            if len(dates) == 1:
+                notification_text = f'Timesheet for {args.start.lower()} is successfully submitted.'
+            else:
+                notification_text = 'Timesheets from {} to {} are successfully submitted.'.format(dates[0], dates[-1])
+            os.system("""osascript -e 'display notification "{}" with title "TP Timesheet"'""".format(notification_text))
 
     finally:
         if args.verbose:
