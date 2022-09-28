@@ -45,7 +45,7 @@ class ScheduleForm:
 
     def schedule(self):
         with CronTab(user=True) as cron:
-            job = cron.new(command=f"{self.executable} --start today --count 1")
+            job = cron.new(command=f"{self.executable} --start today --count 1 --notification")
             job.minute.parse(30)
             job.hour.parse(9)
             job.dow.parse('MON-FRI')
