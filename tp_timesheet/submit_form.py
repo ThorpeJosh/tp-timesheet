@@ -7,7 +7,7 @@ from PIL import Image
 
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
-def submit_timesheet(URL, EMAIL, date, debug=False):
+def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False):
     if not isinstance(date, datetime.date):
         raise TypeError(f"Date must be of type <datetime.date>, got {date}, of type: {type(date)}")
 
@@ -33,7 +33,7 @@ def submit_timesheet(URL, EMAIL, date, debug=False):
     date_field = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/input[1]")
     date_field.send_keys(date.strftime("%m/%d/%Y"))
     
-    if debug:
+    if verbose:
         # Capture image of top half of submission
         image_path = os.path.join(DESKTOP_PATH, f"timesheet_top_{date.strftime('%d_%m_%Y')}.png")
         print(f"Saving top of timesheet to: {image_path}")
@@ -53,13 +53,14 @@ def submit_timesheet(URL, EMAIL, date, debug=False):
     tool_issues = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[6]/div/div[3]/div/div/input")
     tool_issues.send_keys("0")
 
-    # find submit button and click submit
-    submit = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[3]/div[1]/button/div")
-    submit.click()
+    if not dry_run:
+        # find submit button and click submit
+        submit = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[3]/div[1]/button/div")
+        submit.click()
     browser.implicitly_wait(5)
 
     
-    if debug:
+    if verbose:
         # Capture image of top half of submission
         image_path = os.path.join(DESKTOP_PATH, f"timesheet_bottom_{date.strftime('%d_%m_%Y')}.png")
         print(f"Saving bottom of timesheet to: {image_path}")
