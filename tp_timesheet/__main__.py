@@ -29,6 +29,7 @@ def parse_args():
 def run():
     """Entry point"""
     args = parse_args()
+    config = Config()
     # Automate Mode
     if args.automate is not None:
         valid_options = ['weekdays']
@@ -46,7 +47,7 @@ def run():
     else:
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
     dates = date_fn(start = start_date, count = args.count, cal = cal)
-    print(f"Date(s) (YYYY-mm-dd) to be submitted for {Config.EMAIL}:", [str(date) for date in dates])
+    print(f"Date(s) (YYYY-mm-dd) to be submitted for {config.EMAIL}:", [str(date) for date in dates])
 
     docker_handler = DockerHandler()
     try:

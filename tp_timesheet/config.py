@@ -11,7 +11,7 @@ class Config:
     """ Config class, manages the initialization of all the necesarry globals.
     """
     @classmethod
-    def init_conf(cls, url=None, email=None, debug=False):
+    def __init__(cls, url=None, email=None, debug=False):
         """ This is the entry point for the class and running this will setup the tp-timesheet
         config and make all the necesarry globals available
         """
@@ -76,6 +76,3 @@ class Config:
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
         return input_config
-
-# Initialize the config class when this module is imported
-Config.init_conf()
