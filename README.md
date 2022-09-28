@@ -8,15 +8,6 @@ This tool is published on pypi so from any terminal with python3 installed run:
 pip install tp-timesheet
 ```
 
-Then setup the URL and EMAIL to use for the timesheet submission by running the following:
-
-``` bash
-export TP_EMAIL='<TP EMAIL ADDR>'
-export TP_URL='<URL OF TIMESHEET>'
-
-# Add these to your ~/*.rc for this to be persistent
-```
-
 Then run the tool with the help option to find out additional usage information
 
 ``` bash
