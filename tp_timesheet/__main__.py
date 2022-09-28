@@ -72,7 +72,7 @@ def run():
             notification_text = 'Timesheet for today is successfully submitted.'
             if len(dates) != 1:
                 notification_text = 'Timesheets from {} to {} are successfully submitted.'.format(dates[0], dates[-1])
-            os.system("""osascript -e 'display notification "{}" with title "TP_timesheet"'""".format(notification_text))
+            os.system("""osascript -e 'display notification "{}" with title "TP Timesheet"'""".format(notification_text))
 
     finally:
         if args.debug:
