@@ -19,8 +19,10 @@ def parse_args():
                         help="Automate mode: Schedules the form submission to run automatically. Accepted arguments = [weekdays]")
     parser.add_argument('-c', '--count', type=int, required=False, default=1,
                         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week")
-    parser.add_argument('-d', '--debug', action='store_true',
-                      help='Debug mode, saves screenshots of the timesheet submission page to your desktop')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Verbose mode, prints logs and saves screenshots of the timesheet submission page to your desktop')
+    parser.add_argument('-d', '--dry-run', action='store_true',
+                        help='Dry run mode, runs through as per normal but will not click submit')
     return parser.parse_args()
 
 def run():
@@ -54,18 +56,18 @@ def run():
 
     docker_handler = DockerHandler()
     try:
-        if args.debug:
+        if args.verbose:
             print('Pulling latest image')
         docker_handler.pull_image()
-        if args.debug:
+        if args.verbose:
             print('Launching docker container for selenium backend')
         docker_handler.run_container()
 
         for date in dates:
-            submit_timesheet(URL, EMAIL, date, args.debug)
+            submit_timesheet(URL, EMAIL, date, verbose=args.verbose, dry_run=args.dry_run)
 
     finally:
-        if args.debug:
+        if args.verbose:
             print('Cleaning up docker container')
         if docker_handler.container is not None:
             docker_handler.rm_container()
