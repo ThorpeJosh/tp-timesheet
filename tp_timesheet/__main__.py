@@ -1,5 +1,6 @@
 """ Entry point for cli """
 import os
+import sys
 import argparse
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
