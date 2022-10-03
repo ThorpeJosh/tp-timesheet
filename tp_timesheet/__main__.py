@@ -49,8 +49,8 @@ def run():
         start_date = datetime.today()
     else:
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
-    dates = date_fn(start = start_date, count = args.count, cal = cal)
-    print(f"Date(s) (YYYY-mm-dd) to be submitted for {config.EMAIL}:", [str(date) for date in dates])
+    alldates, dates, zerodates = date_fn(start = start_date, count = args.count, cal = cal)
+    print(f"Date(s) (YYYY-mm-dd) to be submitted for {config.EMAIL}:", [str(date) for date in alldates])
 
     docker_handler = DockerHandler()
     try:
@@ -62,7 +62,9 @@ def run():
         docker_handler.run_container()
 
         for date in dates:
-            submit_timesheet(config.URL, config.EMAIL, date, verbose=args.verbose, dry_run=args.dry_run)
+            submit_timesheet(config.URL, config.EMAIL, date, verbose=args.verbose, dry_run=args.dry_run, liveH=8)
+        for date in zerodates:
+            submit_timesheet(config.URL, config.EMAIL, date, verbose=args.verbose, dry_run=args.dry_run, liveH=0)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == 'darwin':

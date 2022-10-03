@@ -7,7 +7,7 @@ from PIL import Image
 
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser('~')), 'Desktop')
 
-def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False):
+def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, liveH = 8):
     if not isinstance(date, datetime.date):
         raise TypeError(f"Date must be of type <datetime.date>, got {date}, of type: {type(date)}")
 
@@ -21,7 +21,7 @@ def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False):
 
     # use browser to access desired webpage
     browser.get(URL)
-
+    browser.maximize_window()
     # wait a bit for elements on webpage to fully load
     browser.implicitly_wait(5)
 
@@ -43,7 +43,7 @@ def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False):
 
     # find and fill in live hours
     live_hours = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[3]/div/div[3]/div/div/input")
-    live_hours.send_keys("8")
+    live_hours.send_keys(liveH)
 
     # find and fill in the rest of the hours
     idle_hours = browser.find_element("xpath", "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[4]/div/div[3]/div/div/input")

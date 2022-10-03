@@ -1,7 +1,9 @@
 from datetime import timedelta
 
 def date_fn(start, count, cal):
+   alldates = []
    dates = []
+   zerodates = [] #dates that are holidays and will be marked with 0 live hours
    for i in range(count):
       day = start+timedelta(days=i)
       day=day.date()
@@ -11,4 +13,7 @@ def date_fn(start, count, cal):
       if day.isoweekday() < 6:
          if day not in holidates:
             dates.append(day)
-   return dates
+         else:
+            zerodates.append(day)
+         alldates.append(day)
+   return alldates, dates, zerodates
