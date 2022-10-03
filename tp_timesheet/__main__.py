@@ -49,8 +49,10 @@ def run():
         start_date = datetime.today()
     else:
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
-    alldates, dates, zerodates = date_fn(start = start_date, count = args.count, cal = cal)
-    print(f"Date(s) (YYYY-mm-dd) to be submitted for {config.EMAIL}:", [str(date) for date in alldates])
+    dates = date_fn(start = start_date, count = args.count, cal = cal)
+    print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
+    string_list=['%s: %d hours' % (date, hours) for (date, hours) in dates]
+    print(string_list)
 
     docker_handler = DockerHandler()
     try:
@@ -61,10 +63,8 @@ def run():
             print('Launching docker container for selenium backend')
         docker_handler.run_container()
 
-        for date in dates:
-            submit_timesheet(config.URL, config.EMAIL, date, verbose=args.verbose, dry_run=args.dry_run, liveH=8)
-        for date in zerodates:
-            submit_timesheet(config.URL, config.EMAIL, date, verbose=args.verbose, dry_run=args.dry_run, liveH=0)
+        for (date, hours) in dates:
+            submit_timesheet(config.URL, config.EMAIL, date, verbose=args.verbose, dry_run=args.dry_run, working_hours=hours)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == 'darwin':
