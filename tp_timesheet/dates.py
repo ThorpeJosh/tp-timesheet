@@ -10,5 +10,7 @@ def date_fn(start, count, cal):
       holidates = [date for (date, _) in holidays]
       if day.isoweekday() < 6:
          if day not in holidates:
-            dates.append(day)
+            dates.append((day, 8))
+         else:
+            dates.append((day, 0))
    return dates
