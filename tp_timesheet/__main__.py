@@ -9,7 +9,7 @@ from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
 from datetime import datetime
 from workalendar.asia import Singapore
-
+import warnings
 
 def parse_args():
     """Parse arguments from the command line"""
@@ -44,6 +44,8 @@ def run():
         return
 
     # Normal Mode
+    if not args.verbose:
+        warnings.filterwarnings("ignore", category=UserWarning)
     cal = Singapore()
     if args.start.lower() == "today":
         start_date = datetime.today()
