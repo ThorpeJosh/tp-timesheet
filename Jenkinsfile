@@ -9,6 +9,7 @@ stages {
                 sh '''
                 virtualenv venv -p python3.9
                 . venv/bin/activate
+                pip install --upgrade pip
                 pip install .[dev]
                 '''
             }
