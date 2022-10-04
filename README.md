@@ -1,4 +1,8 @@
-# tp-timesheet
+# TP-Timesheet
+[![Build Status](https://jenkins.thorpe.work/buildStatus/icon?job=tp-timesheet%2Fmain&subject=build%20status)](https://jenkins.thorpe.work/blue/organizations/jenkins/tp-timesheet/activity)
+[![PyPI version](https://img.shields.io/pypi/v/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
+[![PyPI license](https://img.shields.io/pypi/l/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
+
 Automated submission of TP timesheets
 
 ## Usage
@@ -49,4 +53,3 @@ black --check --diff tp_timesheet # See what formatting changes need to be made
 black tp_timesheet # Run formatter
 pylint tp_timesheet # Run linter
 ```
-
