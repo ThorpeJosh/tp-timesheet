@@ -17,7 +17,7 @@ stages {
             steps {
                 sh '''
                 . venv/bin/activate
-                black tp_timesheet
+                black --check --diff tp_timesheet
                 '''
             }
         }
