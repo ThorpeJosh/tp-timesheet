@@ -15,7 +15,8 @@ DEV_REQUIREMENTS={"dev":
                       "pylint>=2.0.0",
                       "black>=22.8",
                   ]
-                  },
+}
+
 setup(
     name='tp-timesheet',
     version=version,
@@ -30,7 +31,7 @@ setup(
     packages=['tp_timesheet'],
     include_package_data=True,
     install_requires=REQUIREMENTS,
-    extras_requires=DEV_REQUIREMENTS,
+    extras_require=DEV_REQUIREMENTS,
     python_requires='>=3.6',
     classifiers=[
         'License :: OSI Approved :: MIT License',
