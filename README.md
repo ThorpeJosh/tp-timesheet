@@ -34,10 +34,19 @@ tp-timesheet --automate weekdays
 ```
 
 ## Development
-Install and run tool locally (append `--help` to see how to use it):
+Install the dev environment and run tool locally:
 
 ```bash
-pip install -e .
+pip install -e .[dev]
 
-tp-timesheet ...
+tp-timesheet --help
 ```
+### Contributing 
+To run checks prior to committing
+
+```
+black --check --diff tp_timesheet # See what formatting changes need to be made
+black tp_timesheet # Run formatter
+pylint tp_timesheet # Run linter
+```
+
