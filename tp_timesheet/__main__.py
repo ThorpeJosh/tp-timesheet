@@ -45,7 +45,7 @@ def run():
 
     # Normal Mode
     if not args.verbose:
-        warnings.filterwarnings("ignore", category=UserWarning)
+        warnings.filterwarnings("ignore", message="Please take note that, due to arbitrary decisions, ")
     cal = Singapore()
     if args.start.lower() == "today":
         start_date = datetime.today()
