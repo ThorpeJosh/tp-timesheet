@@ -7,7 +7,6 @@ from PIL import Image
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop")
 
 
-# pylint: disable-next=too-many-arguments
 def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hours=8):
     """submit tp timesheet through selenium webdriver"""
     if not isinstance(date, datetime.date):
@@ -95,4 +94,3 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             browser.save_screenshot(image_path)
             image = Image.open(image_path)
             image.show()
-	# pylint: enable=too-many-arguments
