@@ -2,14 +2,15 @@
 import os
 import sys
 import argparse
+import warnings
+from datetime import datetime
+from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.dates import date_fn
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
-from datetime import datetime
-from workalendar.asia import Singapore
-import warnings
+
 
 def parse_args():
     """Parse arguments from the command line"""
@@ -74,7 +75,9 @@ def run():
 
     # Normal Mode
     if not args.verbose:
-        warnings.filterwarnings("ignore", message="Please take note that, due to arbitrary decisions, ")
+        warnings.filterwarnings(
+            "ignore", message="Please take note that, due to arbitrary decisions, "
+        )
     cal = Singapore()
     if args.start.lower() == "today":
         start_date = datetime.today()
@@ -82,7 +85,7 @@ def run():
         start_date = datetime.strptime(args.start, "%d/%m/%Y")
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
-    string_list = ["%s: %d hours" % (date, hours) for (date, hours) in dates]
+    string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
     print(string_list)
 
     docker_handler = DockerHandler()
@@ -111,15 +114,9 @@ def run():
                     f"Timesheet for {args.start.lower()} is successfully submitted."
                 )
             else:
-                notification_text = (
-                    "Timesheets from {} to {} are successfully submitted.".format(
-                        dates[0], dates[-1]
-                    )
-                )
+                notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
             os.system(
-                """osascript -e 'display notification "{}" with title "TP Timesheet"'""".format(
-                    notification_text
-                )
+                f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
             )
 
     finally:

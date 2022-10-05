@@ -1,7 +1,9 @@
+""" Module containing methods to process `date` related """
 from datetime import timedelta
 
 
 def date_fn(start, count, cal):
+    """get workdays from `start` date to `start+count` date"""
     dates = []
     for i in range(count):
         day = start + timedelta(days=i)
