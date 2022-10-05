@@ -7,8 +7,8 @@ from PIL import Image
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop")
 
 
-def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hours=8):
-    # pylint: disable-next=invalid-name, too-many-arguments
+# pylint: disable-next=too-many-arguments
+def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hours=8):
     """submit tp timesheet through selenium webdriver"""
     if not isinstance(date, datetime.date):
         raise TypeError(
@@ -24,7 +24,7 @@ def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hou
     ) as browser:
 
         # use browser to access desired webpage
-        browser.get(URL)
+        browser.get(url)
         browser.maximize_window()
         # wait a bit for elements on webpage to fully load
         browser.implicitly_wait(5)
@@ -34,7 +34,7 @@ def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hou
             "xpath",
             "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input",
         )
-        email_field.send_keys(EMAIL)
+        email_field.send_keys(email)
 
         # find the date field and fill date
         date_field = browser.find_element(
@@ -95,3 +95,4 @@ def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hou
             browser.save_screenshot(image_path)
             image = Image.open(image_path)
             image.show()
+	# pylint: enable=too-many-arguments
