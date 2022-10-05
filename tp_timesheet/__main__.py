@@ -3,6 +3,7 @@ import os
 import sys
 import argparse
 import warnings
+import dateutil.parser
 from datetime import datetime
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
@@ -82,7 +83,7 @@ def run():
     if args.start.lower() == "today":
         start_date = datetime.today()
     else:
-        start_date = datetime.strptime(args.start, "%d/%m/%Y")
+        start_date = dateutil.parser.parse(args.start)
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
