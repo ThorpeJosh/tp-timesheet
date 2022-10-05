@@ -1,6 +1,5 @@
 """ Module containing tool to submit the form """
 import os
-import time
 import datetime
 from selenium import webdriver
 from PIL import Image
@@ -9,6 +8,7 @@ DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop")
 
 
 def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hours=8):
+    '''submit tp timesheet through selenium webdriver'''
     if not isinstance(date, datetime.date):
         raise TypeError(
             f"Date must be of type <datetime.date>, got {date}, of type: {type(date)}"
