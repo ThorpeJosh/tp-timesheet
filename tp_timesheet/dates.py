@@ -1,3 +1,4 @@
+""" Module containing methods to process `date` related """
 from datetime import timedelta
 
 
