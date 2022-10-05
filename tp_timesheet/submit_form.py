@@ -7,6 +7,7 @@ from PIL import Image
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop")
 
 
+# pylint: disable-next=invalid-name
 def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hours=8):
     """submit tp timesheet through selenium webdriver"""
     if not isinstance(date, datetime.date):
@@ -96,3 +97,6 @@ def submit_timesheet(URL, EMAIL, date, verbose=False, dry_run=False, working_hou
 
     # close the browser after submitting
     browser.quit()
+
+
+# pylint: enable=invalid-name
