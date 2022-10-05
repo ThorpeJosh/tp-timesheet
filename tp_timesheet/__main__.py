@@ -3,8 +3,8 @@ import os
 import sys
 import argparse
 import warnings
-import dateutil.parser
 from datetime import datetime
+import dateutil.parser
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
