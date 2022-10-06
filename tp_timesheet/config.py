@@ -1,11 +1,13 @@
 """Module to store, create or read from a configuration file and parse the values and variables to
 globals for other modules to access.
 """
+import logging
 import os
 import re
 import configparser
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
 
 class Config:
     """Config class, manages the initialization of all the necesarry globals."""
@@ -53,7 +55,7 @@ class Config:
         config = configparser.ConfigParser(allow_no_value=True)
         # Write config template to file if it doesn't already exist
         if not os.path.exists(cls.CONFIG_PATH):
-            print("No config file was found, creating one at:", cls.CONFIG_PATH)
+            logger.info(f"No config file was found, creating one at: {cls.CONFIG_PATH}")
             # Gather input from user to populate the config
             email = input("Enter TP email:")
             while not cls.is_valid_email(email):
@@ -71,7 +73,7 @@ class Config:
 
         # Read the config file
         if cls.VERBOSE:
-            print(f"Reading config file at: {cls.CONFIG_PATH}")
+            logger.debug(f"Reading config file at: {cls.CONFIG_PATH}")
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
         return input_config
