@@ -6,6 +6,7 @@ from datetime import datetime
 from crontab import CronTab
 
 TP_BIN = "tp-timesheet"
+SYS_PATH = os.environ.get("PATH")
 
 
 class ScheduleForm:
@@ -55,7 +56,7 @@ cannot be found in: {sysconfig_scripts_path}"
         """Create the crontab schedule"""
         with CronTab(user=True) as cron:
             job = cron.new(
-                command=f"{self.executable} --start today --count 1 --notification"
+                command=f"PATH='{SYS_PATH}' {self.executable} --start today --count 1 --notification"
             )
             job.minute.parse(30)
             job.hour.parse(9)
