@@ -1,5 +1,6 @@
 """ Entry point for cli """
 import os
+import re
 import sys
 import argparse
 import warnings
@@ -23,7 +24,8 @@ def parse_args():
         "-s",
         "--start",
         type=str,
-        help="Normal mode: Indicating first date to submit a timesheet. Accepted arguments = ['Day/Month/Year', 'Day/Month/Year', today]. NOTE: 'Month/Day/Year' is not accepted!",
+        help="Normal mode: Indicating first date to submit a timesheet. \
+        		Accepted arguments = ['Day/Month/Year', 'Day/Month/Year', today]. NOTE: 'Month/Day/Year' is not accepted!",
     )
     group.add_argument(
         "-a",
@@ -59,6 +61,29 @@ def parse_args():
     )
     return parser.parse_args()
 
+def get_start_date(start_date_arg):
+	"""parse user's `start` argument"""
+    if start_date_arg.lower() == "today":
+        start_date = datetime.today()
+    else:
+        # PR#22 Parsing Dates with dateutil
+        numbers = re.split("[-/ ]", start_date_arg)
+        # 4 Digit Year
+        if max(map(len, numbers)) == 4:
+            start_date = dateutil.parser.parse(start_date_arg)
+        # 2 Digit Year
+        else:
+            cand1 = dateutil.parser.parse(start_date_arg, dayfirst=True)  # DMY
+            cand2 = dateutil.parser.parse(start_date_arg, yearfirst=True)  # YMD
+            today = datetime.today()
+            diff1 = abs((cand1 - today).total_seconds())
+            diff2 = abs((cand2 - today).total_seconds())
+            # Select Nearest
+            if diff1 < diff2:
+                start_date = cand1
+            else:
+                start_date = cand2
+    return start_date
 
 def run():
     """Entry point"""
@@ -80,27 +105,8 @@ def run():
             "ignore", message="Please take note that, due to arbitrary decisions, "
         )
     cal = Singapore()
-    if args.start.lower() == "today":
-        start_date = datetime.today()
-    else:
-        # PR#22 Parsing Dates with dateutil
-        numbers = re.split("[-/ ]", args.start)
-        # 4 Digit Year
-        if max(map(len, numbers)) == 4:
-            start_date = dateutil.parser.parse(args.start)
-        # 2 Digit Year
-        else:
-            cand1 = dateutil.parser.parse(args.start, dayfirst=True)  # DMY
-            cand2 = dateutil.parser.parse(args.start, yearfirst=True)  # YMD
-            today = datetime.today()
-            diff1 = abs((cand1 - today).total_seconds())
-            diff2 = abs((cand2 - today).total_seconds())
-            # Select Nearest
-            if diff1 < diff2:
-                start_date = cand1
-            else:
-                start_date = cand2
 
+    start_date = get_start_date(args.start)
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
