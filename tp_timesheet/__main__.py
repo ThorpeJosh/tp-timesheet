@@ -61,6 +61,7 @@ def parse_args():
     )
     return parser.parse_args()
 
+
 def get_start_date(start_date_arg):
     """parse user's `start` argument"""
     if start_date_arg.lower() == "today":
@@ -84,6 +85,7 @@ def get_start_date(start_date_arg):
             else:
                 start_date = cand2
     return start_date
+
 
 def run():
     """Entry point"""
