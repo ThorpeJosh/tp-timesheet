@@ -25,7 +25,8 @@ def parse_args():
         "--start",
         type=str,
         help="Normal mode: Indicating first date to submit a timesheet. \
-                Accepted arguments = ['Day/Month/Year', 'Day/Month/Year', today]. NOTE: 'Month/Day/Year' is not accepted!",
+                Accepted arguments = ['Day/Month/Year', 'Day/Month/Year', today]. \
+                NOTE: 'Month/Day/Year' is not accepted!",
     )
     group.add_argument(
         "-a",
