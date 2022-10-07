@@ -2,6 +2,7 @@
 globals for other modules to access.
 """
 import logging
+import logging.handlers
 import os
 import re
 import configparser
@@ -9,10 +10,12 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 class Config:
     """Config class, manages the initialization of all the necesarry globals."""
 
     # pylint:disable = anomalous-backslash-in-string
+    CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
 
     @classmethod
     def __init__(cls, url=None, email=None, verbose=False):
@@ -22,7 +25,7 @@ class Config:
         cls.URL = url
         cls.EMAIL = email
         cls.VERBOSE = verbose
-        cls.CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
+        cls.CONFIG_DIR = Config.CONFIG_DIR
         cls.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
 
@@ -32,6 +35,30 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
+
+    @staticmethod
+    def init_logger(logger):
+        """Initialze logger."""
+
+        # create root logger
+        logger.setLevel(logging.DEBUG)
+
+        # create formatter
+        log_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+        # log to stdout
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(logging.DEBUG)
+        stream_handler.setFormatter(log_format)
+        logger.addHandler(stream_handler)
+
+        # log to file, rotate every 4 weeks, save up to 8 weeks
+        log_dir = Config.CONFIG_DIR.joinpath("logs")
+        file_handler = logging.handlers.TimedRotatingFileHandler(log_dir, when="W6", interval=4, backupCount=8)
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(log_format)
+        logger.addHandler(file_handler)
+        logger.info("logger formatted in init_logger in config.py")
 
     @staticmethod
     def is_valid_email(email):
@@ -55,7 +82,7 @@ class Config:
         config = configparser.ConfigParser(allow_no_value=True)
         # Write config template to file if it doesn't already exist
         if not os.path.exists(cls.CONFIG_PATH):
-            logger.info(f"No config file was found, creating one at: {cls.CONFIG_PATH}")
+            logger.info("No config file was found, creating one at: %s", cls.CONFIG_PATH)
             # Gather input from user to populate the config
             email = input("Enter TP email:")
             while not cls.is_valid_email(email):
@@ -72,8 +99,13 @@ class Config:
                 config.write(config_file)
 
         # Read the config file
+<<<<<<< HEAD
         if cls.VERBOSE:
             logger.debug(f"Reading config file at: {cls.CONFIG_PATH}")
+=======
+        if cls.DEBUG:
+            logger.debug("Reading config file at: %s", cls.CONFIG_PATH)
+>>>>>>> 6dfd299 (feat: add rotating logs)
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
         return input_config

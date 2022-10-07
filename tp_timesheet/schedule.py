@@ -65,7 +65,7 @@ cannot be found in: {sysconfig_scripts_path}"
             job.dow.parse("MON-FRI")
             assert job.is_valid()
             cron_schedule = job.schedule(date_from=datetime.now())
-        logger.info(f"Job has been scheduled in your crontab, the next scheduled run will be on {cron_schedule.get_next()}.")
+        logger.info("Job has been scheduled in your crontab, the next scheduled run will be on %s.", cron_schedule.get_next())
         logger.info("Run `crontab -l` to see your scheduled tasks.")
         logger.info("Run `crontab -r` to clear all scheduled tasks.")
 
