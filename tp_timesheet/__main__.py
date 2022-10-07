@@ -84,17 +84,23 @@ def run():
         start_date = datetime.today()
     else:
         # PR#22 Parsing Dates with dateutil
-        numbers = re.split('[-/ ]', args.start)
+        numbers = re.split("[-/ ]", args.start)
         # 4 Digit Year
         if max(map(len, numbers)) == 4:
             start_date = dateutil.parser.parse(args.start)
-        #2 Digit Year
+        # 2 Digit Year
         else:
-            cand1 = dateutil.parser.parse(args.start, dayfirst=True) #DMY
-            cand2 = dateutil.parser.parse(args.start, yearfirst=True) #YMD
+            cand1 = dateutil.parser.parse(args.start, dayfirst=True)  # DMY
+            cand2 = dateutil.parser.parse(args.start, yearfirst=True)  # YMD
             today = datetime.today()
+            diff1 = abs((cand1 - today).total_seconds())
+            diff2 = abs((cand2 - today).total_seconds())
             # Select Nearest
-            start_date = cand1 if abs((cand1-today).total_seconds()) < abs((cand2-today).total_seconds()) else cand2
+            if diff1 < diff2:
+                start_date = cand1
+            else:
+                start_date = cand2
+
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
