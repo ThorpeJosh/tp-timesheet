@@ -30,6 +30,14 @@ pipeline {
                 '''
             }
         }
+        stage('Unit Tests') {
+            steps {
+                sh '''
+                . venv/bin/activate
+                tox
+                '''
+            }
+        }
     }
     post {
         always {

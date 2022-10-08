@@ -72,7 +72,11 @@ def get_start_date(start_date_arg):
         numbers = re.split("[-/ ]", start_date_arg)
         # 4 Digit Year
         if max(map(len, numbers)) == 4:
-            start_date = dateutil.parser.parse(start_date_arg)
+            yearfirst = len(numbers[0]) == 4
+            dayfirst = not yearfirst
+            start_date = dateutil.parser.parse(
+                start_date_arg, yearfirst=yearfirst, dayfirst=dayfirst
+            )
         # 2 Digit Year
         else:
             cand1 = dateutil.parser.parse(start_date_arg, dayfirst=True)  # DMY
