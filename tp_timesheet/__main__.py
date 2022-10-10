@@ -1,15 +1,12 @@
 """ Entry point for cli """
 import os
-import re
 import sys
 import argparse
 import warnings
-from datetime import datetime
-import dateutil.parser
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
-from tp_timesheet.dates import date_fn
+from tp_timesheet.date_utils import date_fn, get_start_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
 
@@ -61,35 +58,6 @@ def parse_args():
         help="Dry run mode, runs through as per normal but will not click submit",
     )
     return parser.parse_args()
-
-
-def get_start_date(start_date_arg):
-    """parse user's `start` argument"""
-    if start_date_arg.lower() == "today":
-        start_date = datetime.today()
-    else:
-        # PR#22 Parsing Dates with dateutil
-        numbers = re.split("[-/ ]", start_date_arg)
-        # 4 Digit Year
-        if max(map(len, numbers)) == 4:
-            yearfirst = len(numbers[0]) == 4
-            dayfirst = not yearfirst
-            start_date = dateutil.parser.parse(
-                start_date_arg, yearfirst=yearfirst, dayfirst=dayfirst
-            )
-        # 2 Digit Year
-        else:
-            cand1 = dateutil.parser.parse(start_date_arg, dayfirst=True)  # DMY
-            cand2 = dateutil.parser.parse(start_date_arg, yearfirst=True)  # YMD
-            today = datetime.today()
-            diff1 = abs((cand1 - today).total_seconds())
-            diff2 = abs((cand2 - today).total_seconds())
-            # Select Nearest
-            if diff1 < diff2:
-                start_date = cand1
-            else:
-                start_date = cand2
-    return start_date
 
 
 def run():

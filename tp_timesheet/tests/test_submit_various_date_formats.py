@@ -1,7 +1,7 @@
 """Unit tests for the date parsing method"""
 import os
 import sys
-import datetime
+from datetime import datetime, timedelta
 from tp_timesheet.__main__ import get_start_date
 
 tests_path = os.path.dirname(os.path.abspath(__file__))
@@ -86,16 +86,23 @@ def test_various_date_formats():
     test variaous date formats
     formats : listed on TEST_CASES_FORMATS_DMY, TEST_CASES_FORMATS_YMD
     """
-    today = datetime.datetime.today()
-    year, month, day = today.year, today.month, today.day
-    for date_format in TEST_CASES_FORMATS_DMY + TEST_CASES_FORMATS_YMD:
-        parsed = get_start_date(today.strftime(date_format))
-        assert (
-            parsed.year == year
-        ), f"parsing error, query:{today.strftime(date_format)} and parsed:{parsed}"
-        assert (
-            parsed.month == month
-        ), f"parsing error, query:{today.strftime(date_format)} and parsed:{parsed}"
-        assert (
-            parsed.day == day
-        ), f"parsing error, query:{today.strftime(date_format)} and parsed:{parsed}"
+    # A range beyond 6 month is not supported by the current logic. for instance,
+    # today : 2022-10-10 / target : 2023-4-22 / parsed : 2022-4-23
+    days_span = 180
+    today = datetime.today()
+    for target_date in (
+        today + timedelta(n) for n in range(-1 * days_span, days_span + 1)
+    ):
+        year, month, day = target_date.year, target_date.month, target_date.day
+        for date_format in TEST_CASES_FORMATS_DMY + TEST_CASES_FORMATS_YMD:
+            parsed = get_start_date(target_date.strftime(date_format))
+            query_str = target_date.strftime(date_format)
+            assert (
+                parsed.year == year
+            ), f"parsing error, query:{query_str} and parsed:{parsed}"
+            assert (
+                parsed.month == month
+            ), f"parsing error, query:{query_str} and parsed:{parsed}"
+            assert (
+                parsed.day == day
+            ), f"parsing error, query:{query_str} and parsed:{parsed}"
