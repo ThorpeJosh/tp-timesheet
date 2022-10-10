@@ -52,4 +52,5 @@ To run checks prior to committing
 black --check --diff tp_timesheet # See what formatting changes need to be made
 black tp_timesheet # Run formatter
 pylint tp_timesheet # Run linter
+pytest # Run testing
 ```
