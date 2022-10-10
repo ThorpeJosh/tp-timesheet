@@ -15,6 +15,7 @@ DEV_REQUIREMENTS = {
         "pytest>=6.0.0",
         "pylint~=2.13",
         "black>=22.8",
+        "tox>= 3.0.0",
     ]
 }
 
