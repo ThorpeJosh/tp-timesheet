@@ -1,9 +1,7 @@
 """Unit tests for the date parsing method"""
-import pytest
 import os
 import sys
 import datetime
-import dateutil.parser
 from tp_timesheet.__main__ import get_start_date
 
 tests_path = os.path.dirname(os.path.abspath(__file__))
@@ -83,7 +81,11 @@ TEST_CASES_FORMATS_YMD = [
 # fmt: on
 
 
-def test_varios_date_formats():
+def test_various_date_formats():
+    """
+    test variaous date formats
+    formats : listed on TEST_CASES_FORMATS_DMY, TEST_CASES_FORMATS_YMD
+    """
     today = datetime.datetime.today()
     year, month, day = today.year, today.month, today.day
     for date_format in TEST_CASES_FORMATS_DMY + TEST_CASES_FORMATS_YMD:
