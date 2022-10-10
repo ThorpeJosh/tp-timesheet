@@ -13,7 +13,7 @@ REQUIREMENTS = [
 DEV_REQUIREMENTS = {
     "dev": [
         "pytest>=6.0.0",
-        "pylint>=2.0.0",
+        "pylint~=2.13",
         "black>=22.8",
     ]
 }
