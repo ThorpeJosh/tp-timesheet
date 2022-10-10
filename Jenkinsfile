@@ -3,7 +3,7 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES')
         }
     agent any
-stages {
+    stages {
         stage('Python Environment') {
             steps {
                 sh '''
@@ -29,6 +29,16 @@ stages {
                 pylint tp_timesheet
                 '''
             }
+        }
+    }
+    post {
+        always {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
         }
     }
 }
