@@ -13,6 +13,7 @@ from tp_timesheet.config import Config
 
 logger = logging.getLogger(__name__)
 
+
 def parse_args():
     """Parse arguments from the command line"""
     parser = argparse.ArgumentParser(
@@ -61,6 +62,7 @@ def parse_args():
     )
     return parser.parse_args()
 
+
 def run():
     """Entry point"""
     args = parse_args()
@@ -69,7 +71,9 @@ def run():
     if args.automate is not None:
         valid_options = ["weekdays"]
         if args.automate not in valid_options:
-            logger.error("'%s' is not a valid option for --automate mode", args.automate)
+            logger.error(
+                "'%s' is not a valid option for --automate mode", args.automate
+            )
             return
         scheduler = ScheduleForm()
         scheduler.schedule()
@@ -85,7 +89,9 @@ def run():
     start_date = get_start_date(args.start)
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
-    logger.info("Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list)
+    logger.info(
+        "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
+    )
 
     docker_handler = DockerHandler()
     try:

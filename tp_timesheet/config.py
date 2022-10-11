@@ -16,6 +16,7 @@ class Config:
 
     # pylint:disable = anomalous-backslash-in-string
     CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
+    LOG_PATH = CONFIG_DIR.joinpath("logs")
 
     @classmethod
     def __init__(cls, url=None, email=None, verbose=False):
@@ -37,28 +38,30 @@ class Config:
         cls.URL = config.get("configuration", "tp_url")
 
     @staticmethod
-    def init_logger(logger):
+    def init_logger(logger_name):
         """Initialze logger."""
 
         # create root logger
-        logger.setLevel(logging.DEBUG)
+        logger_name.setLevel(logging.DEBUG)
 
         # create formatter
-        log_format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        log_format = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
 
         # log to stdout
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.DEBUG)
         stream_handler.setFormatter(log_format)
-        logger.addHandler(stream_handler)
+        logger_name.addHandler(stream_handler)
 
         # log to file, rotate every 4 weeks, save up to 8 weeks
-        log_dir = Config.CONFIG_DIR.joinpath("logs")
-        file_handler = logging.handlers.TimedRotatingFileHandler(log_dir, when="W6", interval=4, backupCount=8)
+        file_handler = logging.handlers.TimedRotatingFileHandler(
+            Config.LOG_PATH, when="W6", interval=4, backupCount=8
+        )
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(log_format)
-        logger.addHandler(file_handler)
-        logger.info("logger formatted in init_logger in config.py")
+        logger_name.addHandler(file_handler)
 
     @staticmethod
     def is_valid_email(email):
@@ -82,7 +85,9 @@ class Config:
         config = configparser.ConfigParser(allow_no_value=True)
         # Write config template to file if it doesn't already exist
         if not os.path.exists(cls.CONFIG_PATH):
-            logger.info("No config file was found, creating one at: %s", cls.CONFIG_PATH)
+            logger.info(
+                "No config file was found, creating one at: %s", cls.CONFIG_PATH
+            )
             # Gather input from user to populate the config
             email = input("Enter TP email:")
             while not cls.is_valid_email(email):
