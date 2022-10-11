@@ -63,7 +63,7 @@ def parse_args():
 def run():
     """Entry point"""
     args = parse_args()
-    config = Config()
+    config = Config(verbose=args.verbose)
     # Automate Mode
     if args.automate is not None:
         valid_options = ["weekdays"]
