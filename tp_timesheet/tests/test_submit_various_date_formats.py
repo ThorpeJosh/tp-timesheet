@@ -2,7 +2,7 @@
 import os
 import sys
 from datetime import datetime, timedelta
-from tp_timesheet.__main__ import get_start_date
+from tp_timesheet.date_utils import get_start_date
 
 tests_path = os.path.dirname(os.path.abspath(__file__))
 src_path = tests_path + "/../"
