@@ -15,6 +15,7 @@ class Config:
     """Config class, manages the initialization of all the necesarry globals."""
 
     # pylint:disable = anomalous-backslash-in-string
+    ROOT_LOGGER = None
     CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     LOG_DIR = CONFIG_DIR.joinpath("logs")
@@ -32,6 +33,9 @@ class Config:
         cls.CONFIG_DIR = Config.CONFIG_DIR
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
 
+        # Initialize root logger
+        cls.init_logger()
+
         # Read from config file
         config = cls._read_write_config()
 
@@ -39,12 +43,12 @@ class Config:
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
 
-    @staticmethod
-    def init_logger(logger_name):
-        """Initialze logger."""
+    @classmethod
+    def init_logger(cls):
+        """Initialze root logger."""
 
         # create root logger
-        logger_name.setLevel(logging.DEBUG)
+        cls.ROOT_LOGGER.setLevel(logging.DEBUG)
 
         # create formatter
         log_format = logging.Formatter(
@@ -52,10 +56,11 @@ class Config:
         )
 
         # log to stdout
+        level = logging.DEBUG if cls.VERBOSE else logging.INFO
         stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.DEBUG)
+        stream_handler.setLevel(level)
         stream_handler.setFormatter(log_format)
-        logger_name.addHandler(stream_handler)
+        cls.ROOT_LOGGER.addHandler(stream_handler)
 
         # log to file, rotate every 4 weeks, save up to 8 weeks
         file_handler = logging.handlers.TimedRotatingFileHandler(
@@ -63,7 +68,7 @@ class Config:
         )
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(log_format)
-        logger_name.addHandler(file_handler)
+        cls.ROOT_LOGGER.addHandler(file_handler)
 
     @staticmethod
     def is_valid_email(email):

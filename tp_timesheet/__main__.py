@@ -66,6 +66,7 @@ def parse_args():
 def run():
     """Entry point"""
     args = parse_args()
+
     config = Config(verbose=args.verbose)
     # Automate Mode
     if args.automate is not None:
@@ -95,11 +96,9 @@ def run():
 
     docker_handler = DockerHandler()
     try:
-        if args.verbose:
-            logger.debug("Pulling latest image")
+        logger.debug("Pulling latest image")
         docker_handler.pull_image()
-        if args.verbose:
-            logger.debug("Launching docker container for selenium backend")
+        logger.debug("Launching docker container for selenium backend")
         docker_handler.run_container()
 
         for (date, hours) in dates:
@@ -125,8 +124,7 @@ def run():
             )
 
     finally:
-        if args.verbose:
-            logger.debug("Cleaning up docker container")
+        logger.debug("Cleaning up docker container")
         if docker_handler.container is not None:
             docker_handler.rm_container()
 
