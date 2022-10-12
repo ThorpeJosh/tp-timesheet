@@ -1,15 +1,22 @@
 pipeline {
     options {
-        timeout(time: 10, unit: 'MINUTES')
+        timeout(time: 5, unit: 'MINUTES')
+    }
+    agent {
+        docker {
+            image 'python:3.8-slim'
+	    args '-e "HOME=$WORKSPACE"'
         }
-    agent any
+    }
     stages {
         stage('Python Environment') {
             steps {
                 sh '''
-                rm -vr ~/.config/tp-timesheet || true
-                virtualenv venv -p python3.9
-                . venv/bin/activate
+                echo "HOME: $HOME"
+                echo "~/"
+		pwd
+                python -m venv venv
+		. venv/bin/activate
                 pip install --upgrade pip
                 pip install .[dev]
                 '''
@@ -18,7 +25,7 @@ pipeline {
         stage('Code Formatter') {
             steps {
                 sh '''
-                . venv/bin/activate
+		. venv/bin/activate
                 black --check --diff tp_timesheet
                 '''
             }
@@ -26,7 +33,7 @@ pipeline {
         stage('Linter') {
             steps {
                 sh '''
-                . venv/bin/activate
+		. venv/bin/activate
                 pylint tp_timesheet
                 '''
             }
@@ -34,8 +41,8 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh '''
-                . venv/bin/activate
-                tox
+		. venv/bin/activate
+                pytest
                 '''
             }
         }
