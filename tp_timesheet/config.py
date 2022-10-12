@@ -16,6 +16,7 @@ class Config:
 
     # pylint:disable = anomalous-backslash-in-string
     CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
     LOG_PATH = CONFIG_DIR.joinpath("logs")
 
     @classmethod
@@ -27,7 +28,6 @@ class Config:
         cls.EMAIL = email
         cls.VERBOSE = verbose
         cls.CONFIG_DIR = Config.CONFIG_DIR
-        cls.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
 
         # Read from config file
