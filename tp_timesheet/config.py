@@ -22,7 +22,7 @@ class Config:
         cls.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
 
-        cls.DEFAULT = {"max_submit_within_days": "7"}
+        cls.DEFAULT = {"check_max_days": "True", "max_submit_within_days": "7"}
 
         # Read from config file
         config = cls._read_write_config()
@@ -31,6 +31,7 @@ class Config:
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
         cls.MAX_DAYS = config.get("configuration", "max_submit_within_days")
+        cls.CHECK_MAX_DAYS = config.get("configuration", "check_max_days")
 
     @staticmethod
     def is_valid_email(email):
@@ -65,6 +66,7 @@ class Config:
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
+                "check_max_days": "True",
                 "max_submit_within_days": 7,
             }
 
@@ -78,7 +80,7 @@ class Config:
         input_config.read(cls.CONFIG_PATH)
 
         # Version compatibility (#20)
-        for config_key in ["max_submit_within_days"]:
+        for config_key in ["check_max_days", "max_submit_within_days"]:
             if not input_config.has_option("configuration", config_key):
                 input_config.set("configuration", config_key, cls.DEFAULT[config_key])
 

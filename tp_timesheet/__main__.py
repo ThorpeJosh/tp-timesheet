@@ -6,7 +6,7 @@ import warnings
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
-from tp_timesheet.date_utils import date_fn, get_start_date, check_date
+from tp_timesheet.date_utils import date_fn, get_start_date, assert_start_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
 
@@ -82,7 +82,7 @@ def run():
     cal = Singapore()
 
     start_date = get_start_date(args.start)
-    check_date(start_date)
+    assert_start_date(start_date)
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
