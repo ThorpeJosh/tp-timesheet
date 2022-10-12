@@ -13,16 +13,16 @@ class Config:
     # pylint:disable = anomalous-backslash-in-string
 
     @classmethod
-    def __init__(cls, url=None, email=None, debug=False):
+    def __init__(cls, debug=False):
         """This is the entry point for the class and running this will setup the tp-timesheet
         config and make all the necesarry globals available
         """
-        cls.URL = url
-        cls.EMAIL = email
         cls.DEBUG = debug
         cls.CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
         cls.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
+
+        cls.DEFAULT = {"max_submit_within_days": "7"}
 
         # Read from config file
         config = cls._read_write_config()
@@ -30,6 +30,7 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
+        cls.MAX_DAYS = config.get("configuration", "max_submit_within_days")
 
     @staticmethod
     def is_valid_email(email):
@@ -64,6 +65,7 @@ class Config:
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
+                "max_submit_within_days": 7,
             }
 
             with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
@@ -74,4 +76,13 @@ class Config:
             print("Reading config file at: %s", cls.CONFIG_PATH)
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
+
+        # Version compatibility (#20)
+        for config_key in ["max_submit_within_days"]:
+            if not input_config.has_option("configuration", config_key):
+                input_config.set("configuration", config_key, cls.DEFAULT[config_key])
+
+        with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
+            input_config.write(config_file)
+
         return input_config
