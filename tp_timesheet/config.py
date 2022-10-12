@@ -17,7 +17,9 @@ class Config:
     # pylint:disable = anomalous-backslash-in-string
     CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    LOG_PATH = CONFIG_DIR.joinpath("logs")
+    LOG_DIR = CONFIG_DIR.joinpath("logs")
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    LOG_PATH = LOG_DIR.joinpath("tp.logs")
 
     @classmethod
     def __init__(cls, url=None, email=None, verbose=False):
