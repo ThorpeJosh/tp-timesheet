@@ -17,7 +17,7 @@ class Config:
         """This is the entry point for the class and running this will setup the tp-timesheet
         config and make all the necesarry globals available
         """
-        cls.DEBUG = debug
+        cls.VERBOSE = verbose
         cls.CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
         cls.CONFIG_DIR.mkdir(parents=True, exist_ok=True)
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
@@ -74,8 +74,8 @@ class Config:
                 config.write(config_file)
 
         # Read the config file
-        if cls.DEBUG:
-            print("Reading config file at: %s", cls.CONFIG_PATH)
+        if cls.VERBOSE:
+            print(f"Reading config file at: {cls.CONFIG_PATH}")
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
 
