@@ -104,13 +104,8 @@ class Config:
                 config.write(config_file)
 
         # Read the config file
-<<<<<<< HEAD
         if cls.VERBOSE:
-            logger.debug(f"Reading config file at: {cls.CONFIG_PATH}")
-=======
-        if cls.DEBUG:
             logger.debug("Reading config file at: %s", cls.CONFIG_PATH)
->>>>>>> 6dfd299 (feat: add rotating logs)
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
         return input_config
