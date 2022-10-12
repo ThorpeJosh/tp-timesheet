@@ -3,6 +3,7 @@ import re
 from typing import List, Tuple
 from datetime import datetime, timedelta
 import dateutil.parser
+from tp_timesheet.config import Config
 
 
 def get_working_dates(
@@ -53,3 +54,23 @@ def get_start_date(start_date_arg: str) -> datetime:
             else:
                 start_date = cand2
     return start_date
+
+
+def check_date(start_date):
+    """
+    check the start date submitting is bounded within `n` days.
+    parse `n` from config file. default : 7
+    """
+    start_date_str = start_date.strftime("%d/%m/%Y")
+    config = Config()
+    today = datetime.today()
+    if int(config.MAX_DAYS) < abs(today - start_date).days:
+        user_confirm = input(
+            f"The start date you process is '{start_date_str}' "
+            f"and submitting beyond '{config.MAX_DAYS}' day is not recommended.\n"
+            "You can modify the threshold and/or disable this confirmation option from '{config.CONFIG_PATH}'.\n"
+            f"Do you want to submit the timesheet of the date?[y/N]: "
+        )
+        if user_confirm.lower() != "y":
+            print("Aborted. Please re-start the program and pass new dates to process.")
+            sys.exit()

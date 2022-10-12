@@ -33,6 +33,8 @@ class Config:
         cls.CONFIG_DIR = Config.CONFIG_DIR
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
 
+        cls.DEFAULT = {"max_submit_within_days": "7"}
+
         # Initialize root logger
         cls.init_logger()
 
@@ -42,6 +44,7 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
+        cls.MAX_DAYS = config.get("configuration", "max_submit_within_days")
 
     @classmethod
     def init_logger(cls):
@@ -105,6 +108,7 @@ class Config:
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
+                "max_submit_within_days": 7,
             }
 
             with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
@@ -115,4 +119,13 @@ class Config:
             logger.debug("Reading config file at: %s", cls.CONFIG_PATH)
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
+
+        # Version compatibility (#20)
+        for config_key in ["max_submit_within_days"]:
+            if not input_config.has_option("configuration", config_key):
+                input_config.set("configuration", config_key, cls.DEFAULT[config_key])
+
+        with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
+            input_config.write(config_file)
+
         return input_config

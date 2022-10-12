@@ -7,7 +7,7 @@ import warnings
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
-from tp_timesheet.date_utils import get_working_dates, get_start_date
+from tp_timesheet.date_utils import get_working_dates, get_start_date, check_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
 
@@ -94,6 +94,7 @@ def run():
     cal = Singapore()
 
     start_date = get_start_date(args.start)
+    check_date(start_date)
     dates = get_working_dates(
         start=start_date, count=args.count, cal=cal, working_hours=args.hours
     )
