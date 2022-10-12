@@ -71,7 +71,7 @@ class Config:
 
         # Read the config file
         if cls.VERBOSE:
-            print("Reading config file at: %s" % cls.CONFIG_PATH)
+            print(f"Reading config file at: {cls.CONFIG_PATH}")
         input_config = configparser.ConfigParser()
         input_config.read(cls.CONFIG_PATH)
         return input_config
