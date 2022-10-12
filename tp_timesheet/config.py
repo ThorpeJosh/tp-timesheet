@@ -13,7 +13,7 @@ class Config:
     # pylint:disable = anomalous-backslash-in-string
 
     @classmethod
-    def __init__(cls, debug=False):
+    def __init__(cls, verbose=False):
         """This is the entry point for the class and running this will setup the tp-timesheet
         config and make all the necesarry globals available
         """
