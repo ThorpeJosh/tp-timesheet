@@ -7,6 +7,7 @@ pipeline {
         stage('Python Environment') {
             steps {
                 sh '''
+                rm -vr ~/.config/tp-timesheet || true
                 virtualenv venv -p python3.9
                 . venv/bin/activate
                 pip install --upgrade pip
