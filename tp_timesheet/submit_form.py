@@ -1,8 +1,11 @@
 """ Module containing tool to submit the form """
+import logging
 import os
 import datetime
 from selenium import webdriver
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop")
 
@@ -47,7 +50,7 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             image_path = os.path.join(
                 DESKTOP_PATH, f"timesheet_top_{date.strftime('%d_%m_%Y')}.png"
             )
-            print(f"Saving top of timesheet to: {image_path}")
+            logger.info("Saving top of timesheet to: %s", image_path)
             browser.save_screenshot(image_path)
             image = Image.open(image_path)
             image.show()
@@ -90,7 +93,7 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             image_path = os.path.join(
                 DESKTOP_PATH, f"timesheet_bottom_{date.strftime('%d_%m_%Y')}.png"
             )
-            print(f"Saving bottom of timesheet to: {image_path}")
+            logger.info("Saving bottom of timesheet to: %s", image_path)
             browser.save_screenshot(image_path)
             image = Image.open(image_path)
             image.show()
