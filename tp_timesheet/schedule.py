@@ -2,11 +2,14 @@
 import os
 import sysconfig
 import sys
+import logging
 from datetime import datetime
 from crontab import CronTab
 
 TP_BIN = "tp-timesheet"
 SYS_PATH = os.environ.get("PATH")
+
+logger = logging.getLogger(__name__)
 
 
 class ScheduleForm:
@@ -63,11 +66,12 @@ cannot be found in: {sysconfig_scripts_path}"
             job.dow.parse("MON-FRI")
             assert job.is_valid()
             cron_schedule = job.schedule(date_from=datetime.now())
-        print(
-            f"Job has been scheduled in your crontab, the next scheduled run will be on {cron_schedule.get_next()}."
+        logger.info(
+            "Job has been scheduled in your crontab, the next scheduled run will be on %s.",
+            cron_schedule.get_next(),
         )
-        print("Run `crontab -l` to see your scheduled tasks.")
-        print("Run `crontab -r` to clear all scheduled tasks.")
+        logger.info("Run `crontab -l` to see your scheduled tasks.")
+        logger.info("Run `crontab -r` to clear all scheduled tasks.")
 
 
 if __name__ == "__main__":

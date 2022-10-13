@@ -1,4 +1,5 @@
 """ Entry point for cli """
+import logging
 import os
 import sys
 import argparse
@@ -9,6 +10,8 @@ from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.date_utils import date_fn, get_start_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
+
+logger = logging.getLogger(__name__)
 
 
 def parse_args():
@@ -63,12 +66,15 @@ def parse_args():
 def run():
     """Entry point"""
     args = parse_args()
+
     config = Config(verbose=args.verbose)
     # Automate Mode
     if args.automate is not None:
         valid_options = ["weekdays"]
         if args.automate not in valid_options:
-            print(f"'{args.automate}' is not a valid option for --automate mode")
+            logger.error(
+                "'%s' is not a valid option for --automate mode", args.automate
+            )
             return
         scheduler = ScheduleForm()
         scheduler.schedule()
@@ -83,17 +89,16 @@ def run():
 
     start_date = get_start_date(args.start)
     dates = date_fn(start=start_date, count=args.count, cal=cal)
-    print(f"Date(s) (yyyy-mm-dd) to be submitted for {config.EMAIL}:")
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
-    print(string_list)
+    logger.info(
+        "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
+    )
 
     docker_handler = DockerHandler()
     try:
-        if args.verbose:
-            print("Pulling latest image")
+        logger.debug("Pulling latest image")
         docker_handler.pull_image()
-        if args.verbose:
-            print("Launching docker container for selenium backend")
+        logger.debug("Launching docker container for selenium backend")
         docker_handler.run_container()
 
         for (date, hours) in dates:
@@ -119,8 +124,7 @@ def run():
             )
 
     finally:
-        if args.verbose:
-            print("Cleaning up docker container")
+        logger.debug("Cleaning up docker container")
         if docker_handler.container is not None:
             docker_handler.rm_container()
 
