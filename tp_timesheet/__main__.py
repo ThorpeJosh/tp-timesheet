@@ -119,6 +119,8 @@ def run():
                 )
             else:
                 notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
+            if args.dry_run:
+                notification_text = f"[DRY_RUN] {notification_text}"
             os.system(
                 f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
             )
