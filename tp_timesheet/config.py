@@ -18,8 +18,8 @@ class Config:
     ROOT_LOGGER = None
     CONFIG_DIR = Path.home().joinpath(".config", "tp-timesheet")
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    LOG_DIR = CONFIG_DIR.joinpath("logs")
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    LOG_DIR = Path.joinpath(CONFIG_DIR, "logs")
+    LOG_DIR.mkdir(exist_ok=True)
     LOG_PATH = LOG_DIR.joinpath("tp.logs")
 
     @classmethod
