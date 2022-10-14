@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'docker && linux' }
     options {
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 30, unit: 'MINUTES')
     }
     stages {
         stage('Build And Test Pipeline') {
@@ -20,6 +20,9 @@ pipeline {
                 }
                 stages {
                     stage('Python Environment') {
+                        options {
+                            timeout(time: 5, unit: 'MINUTES')
+                        }
                         steps {
                             echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
@@ -31,6 +34,9 @@ pipeline {
                         }
                     }
                     stage('Code Format') {
+                        options {
+                            timeout(time: 30, unit: 'SECONDS')
+                        }
                         steps {
                             echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
@@ -40,6 +46,9 @@ pipeline {
                         }
                     }
                     stage('Linter') {
+                        options {
+                            timeout(time: 1, unit: 'MINUTES')
+                        }
                         steps {
                             echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
@@ -49,6 +58,9 @@ pipeline {
                         }
                     }
                     stage('Unit Tests') {
+                        options {
+                            timeout(time: 1, unit: 'MINUTES')
+                        }
                         steps {
                             echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
