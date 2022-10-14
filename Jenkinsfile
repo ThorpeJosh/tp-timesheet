@@ -21,6 +21,7 @@ pipeline {
                 stages {
                     stage('Python Environment') {
                         steps {
+                            echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
                             python -m venv venv
                             . venv/bin/activate
@@ -31,6 +32,7 @@ pipeline {
                     }
                     stage('Code Format') {
                         steps {
+                            echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             black --check --diff tp_timesheet
@@ -39,6 +41,7 @@ pipeline {
                     }
                     stage('Linter') {
                         steps {
+                            echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             pylint tp_timesheet
@@ -47,6 +50,7 @@ pipeline {
                     }
                     stage('Unit Tests') {
                         steps {
+                            echo "Environment = Python:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             pytest
