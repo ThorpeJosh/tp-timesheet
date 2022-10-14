@@ -3,12 +3,15 @@ pipeline {
     options {
         timeout(time: 5, unit: 'MINUTES')
     }
+    environment {
+        DOCKER_IMAGE = 'python'
+    }
     stages {
         stage('Build And Test Pipeline') {
             matrix {
                 agent {
                     docker {
-                        image "python:${DOCKER_TAG}"
+                        image "${DOCKER_IMAGE}:${DOCKER_TAG}"
                         args '-e "HOME=$WORKSPACE"'
                     }
                 }
@@ -21,6 +24,7 @@ pipeline {
                 stages {
                     stage('Python Environment') {
                         steps {
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             python -m venv venv
                             . venv/bin/activate
@@ -31,6 +35,7 @@ pipeline {
                     }
                     stage('Code Format') {
                         steps {
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             black --check --diff tp_timesheet
@@ -39,6 +44,7 @@ pipeline {
                     }
                     stage('Linter') {
                         steps {
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             pylint tp_timesheet
@@ -47,6 +53,7 @@ pipeline {
                     }
                     stage('Unit Tests') {
                         steps {
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             pytest
