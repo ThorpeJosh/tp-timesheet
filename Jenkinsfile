@@ -3,12 +3,15 @@ pipeline {
     options {
         timeout(time: 30, unit: 'MINUTES')
     }
+    environment {
+        DOCKER_IMAGE = 'python'
+    }
     stages {
         stage('Build And Test Pipeline') {
             matrix {
                 agent {
                     docker {
-                        image "python:${DOCKER_TAG}"
+                        image "${DOCKER_IMAGE}:${DOCKER_TAG}"
                         args '-e "HOME=$WORKSPACE"'
                     }
                 }
@@ -24,7 +27,7 @@ pipeline {
                             timeout(time: 5, unit: 'MINUTES')
                         }
                         steps {
-                            echo "Environment = Python:${DOCKER_TAG}"
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             python -m venv venv
                             . venv/bin/activate
@@ -38,7 +41,7 @@ pipeline {
                             timeout(time: 30, unit: 'SECONDS')
                         }
                         steps {
-                            echo "Environment = Python:${DOCKER_TAG}"
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             black --check --diff tp_timesheet
@@ -50,7 +53,7 @@ pipeline {
                             timeout(time: 1, unit: 'MINUTES')
                         }
                         steps {
-                            echo "Environment = Python:${DOCKER_TAG}"
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             pylint tp_timesheet
@@ -62,7 +65,7 @@ pipeline {
                             timeout(time: 1, unit: 'MINUTES')
                         }
                         steps {
-                            echo "Environment = Python:${DOCKER_TAG}"
+                            echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
                             . venv/bin/activate
                             pytest
