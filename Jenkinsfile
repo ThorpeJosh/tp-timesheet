@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'docker && linux' }
     options {
-        timeout(time: 5, unit: 'MINUTES')
+        timeout(time: 15, unit: 'MINUTES')
     }
     environment {
         DOCKER_IMAGE = 'python'
