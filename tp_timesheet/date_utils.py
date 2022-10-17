@@ -4,21 +4,21 @@ from datetime import datetime, timedelta
 import dateutil.parser
 
 
-def date_fn(start, count, cal):
+def get_working_dates(start, count, cal):
     """get workdays from `start` date to `start+count` date"""
-    dates = []
+    working_dates = []
     for i in range(count):
-        day = start + timedelta(days=i)
-        day = day.date()
-        year = day.year
+        current_date = start + timedelta(days=i)
+        current_date = current_date.date()
+        year = current_date.year
         holidays = cal.holidays(year)
         holidates = [date for (date, _) in holidays]
-        if day.isoweekday() < 6:
-            if day not in holidates:
-                dates.append((day, 8))
+        if current_date.isoweekday() < 6:
+            if current_date not in holidates:
+                working_dates.append((current_date, 8))  # 8: number of working hours
             else:
-                dates.append((day, 0))
-    return dates
+                working_dates.append((current_date, 0))  # 0: number of working hours
+    return working_dates
 
 
 def get_start_date(start_date_arg):
