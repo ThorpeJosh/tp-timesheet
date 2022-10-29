@@ -121,9 +121,9 @@ class Config:
         input_config.read(cls.CONFIG_PATH)
 
         # Version compatibility (#20)
-        for config_key in ["check_max_days", "max_submit_within_days"]:
+        for config_key, config_value in cls.DEFAULT.items():
             if not input_config.has_option("configuration", config_key):
-                input_config.set("configuration", config_key, cls.DEFAULT[config_key])
+                input_config.set("configuration", config_key, config_value)
 
         with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
             input_config.write(config_file)

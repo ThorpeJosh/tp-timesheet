@@ -16,6 +16,7 @@ DEV_REQUIREMENTS = {
         "pylint~=2.13",
         "black>=22.8",
         "tox>= 3.0.0",
+        "mock~=4.0.3",
     ]
 }
 

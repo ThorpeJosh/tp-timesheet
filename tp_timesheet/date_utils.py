@@ -1,6 +1,5 @@
 """ Module containing methods to process `date` related """
 import re
-import sys
 from datetime import datetime, timedelta
 import dateutil.parser
 from tp_timesheet.config import Config
@@ -26,7 +25,7 @@ def date_fn(start, count, cal):
 def get_start_date(start_date_arg):
     """parse user's `start` argument"""
     if start_date_arg.lower() == "today":
-        start_date = datetime.today()
+        start_date = datetime.today().date()
     else:
         # PR#22 Parsing Dates with dateutil
         numbers = re.split("[-/ ]", start_date_arg)
@@ -36,12 +35,12 @@ def get_start_date(start_date_arg):
             dayfirst = not yearfirst
             start_date = dateutil.parser.parse(
                 start_date_arg, yearfirst=yearfirst, dayfirst=dayfirst
-            )
+            ).date()
         # 2 Digit Year
         else:
-            cand1 = dateutil.parser.parse(start_date_arg, dayfirst=True)  # DMY
-            cand2 = dateutil.parser.parse(start_date_arg, yearfirst=True)  # YMD
-            today = datetime.today()
+            cand1 = dateutil.parser.parse(start_date_arg, dayfirst=True).date()  # DMY
+            cand2 = dateutil.parser.parse(start_date_arg, yearfirst=True).date()  # YMD
+            today = datetime.today().date()
             diff1 = abs((cand1 - today).total_seconds())
             diff2 = abs((cand2 - today).total_seconds())
             # Select Nearest
@@ -58,7 +57,7 @@ def assert_start_date(start_date):
     parse `n` from config file. default : 7
     """
     start_date_str = start_date.strftime("%d/%m/%Y")
-    today = datetime.today()
+    today = datetime.today().date()
     if Config.CHECK_MAX_DAYS and int(Config.MAX_DAYS) < abs(today - start_date).days:
         user_confirm = input(
             f"The entered date '{start_date_str}' "
@@ -70,4 +69,5 @@ def assert_start_date(start_date):
         )
         if user_confirm.lower() != "y":
             print("Aborted. Please re-start the program and pass new dates to process.")
-            sys.exit()
+            return False
+    return True

@@ -1,8 +1,11 @@
 """Unit tests for the date parsing method"""
 import os
 import sys
+import builtins
 from datetime import datetime, timedelta
-from tp_timesheet.date_utils import get_start_date
+import mock
+from tp_timesheet.date_utils import get_start_date, assert_start_date
+from tp_timesheet.config import Config
 
 tests_path = os.path.dirname(os.path.abspath(__file__))
 src_path = tests_path + "/../"
@@ -106,3 +109,32 @@ def test_various_date_formats():
             assert (
                 parsed.day == day
             ), f"parsing error, query:{query_str} and parsed:{parsed}"
+
+
+def test_assert_start_date():
+    """
+    test the assert function of start date
+    """
+    Config()
+    Config.CHECK_MAX_DAYS = True
+
+    testing_span = 2 * int(Config.MAX_DAYS)
+    today = datetime.today().date()
+
+    with mock.patch.object(builtins, "input", lambda _: "y"):
+        for delta in range(-1 * testing_span, testing_span + 1):
+            assertion_result = assert_start_date(today + timedelta(delta))
+            assert assertion_result, "start date assertion failed"
+
+    with mock.patch.object(builtins, "input", lambda _: "n"):
+        for delta in range(-1 * testing_span, -1 * int(Config.MAX_DAYS)):
+            assertion_result = assert_start_date(today + timedelta(delta))
+            assert not assertion_result, "start date assertion failed"
+
+        for delta in range(-1 * int(Config.MAX_DAYS), int(Config.MAX_DAYS) + 1):
+            assertion_result = assert_start_date(today + timedelta(delta))
+            assert assertion_result, "start date assertion failed"
+
+        for delta in range(int(Config.MAX_DAYS) + 1, testing_span + 1):
+            assertion_result = assert_start_date(today + timedelta(delta))
+            assert not assertion_result, "start date assertion failed"

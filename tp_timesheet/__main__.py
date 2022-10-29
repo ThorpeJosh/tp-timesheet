@@ -88,7 +88,8 @@ def run():
     cal = Singapore()
 
     start_date = get_start_date(args.start)
-    assert_start_date(start_date)
+    if not assert_start_date(start_date):
+        sys.exit()
     dates = date_fn(start=start_date, count=args.count, cal=cal)
     string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
     logger.info(
