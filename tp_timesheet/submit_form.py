@@ -31,6 +31,7 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
         # wait a bit for elements on webpage to fully load
         browser.implicitly_wait(5)
 
+        # pylint: disable=line-too-long
         # find the email field element and fill your email
         email_field = browser.find_element(
             "xpath",
@@ -87,6 +88,7 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             )
             submit.click()
         browser.implicitly_wait(5)
+        # pylint: enable=line-too-long
 
         if verbose:
             # Capture image of top half of submission
