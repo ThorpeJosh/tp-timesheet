@@ -3,6 +3,7 @@ import logging
 import os
 import datetime
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from PIL import Image
 
 logger = logging.getLogger(__name__)
@@ -31,18 +32,17 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
         # wait a bit for elements on webpage to fully load
         browser.implicitly_wait(5)
 
-        # pylint: disable=line-too-long
         # find the email field element and fill your email
         email_field = browser.find_element(
-            "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input",
+            By.XPATH,
+            "(//input)[1]",
         )
         email_field.send_keys(email)
 
         # find the date field and fill date
         date_field = browser.find_element(
-            "xpath",
-            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/div/div/div/input",
+            By.XPATH,
+            "(//input)[2]",
         )
         date_field.send_keys(date.strftime("%m/%d/%Y"))
 
@@ -58,37 +58,36 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
 
         # find and fill in live hours
         live_hours = browser.find_element(
-            "xpath",
-            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[3]/div/div[3]/div/div/input",
+            By.XPATH,
+            "(//input)[3]",
         )
         live_hours.send_keys(working_hours)
 
         # find and fill in the rest of the hours
         idle_hours = browser.find_element(
-            "xpath",
-            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[4]/div/div[3]/div/div/input",
+            By.XPATH,
+            "(//input)[4]",
         )
         idle_hours.send_keys("0")
         training_hours = browser.find_element(
-            "xpath",
-            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[5]/div/div[3]/div/div/input",
+            By.XPATH,
+            "(//input)[5]",
         )
         training_hours.send_keys("0")
         tool_issues = browser.find_element(
-            "xpath",
-            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[6]/div/div[3]/div/div/input",
+            By.XPATH,
+            "(//input)[6]",
         )
         tool_issues.send_keys("0")
 
         if not dry_run:
             # find submit button and click submit
             submit = browser.find_element(
-                "xpath",
-                "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[3]/div[1]/button/div",
+                By.XPATH,
+                "(//button)[2]/div[1]",
             )
             submit.click()
         browser.implicitly_wait(5)
-        # pylint: enable=line-too-long
 
         if verbose:
             # Capture image of top half of submission
