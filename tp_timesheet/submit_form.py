@@ -34,14 +34,14 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
         # find the email field element and fill your email
         email_field = browser.find_element(
             "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input",
+            "/html/body/div/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[1]/div/div[3]/div/div/input",
         )
         email_field.send_keys(email)
 
         # find the date field and fill date
         date_field = browser.find_element(
             "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/input[1]",
+            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[2]/div/div[3]/div/div/div/div/div/input",
         )
         date_field.send_keys(date.strftime("%m/%d/%Y"))
 
@@ -58,24 +58,24 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
         # find and fill in live hours
         live_hours = browser.find_element(
             "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[3]/div/div[3]/div/div/input",
+            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[3]/div/div[3]/div/div/input",
         )
         live_hours.send_keys(working_hours)
 
         # find and fill in the rest of the hours
         idle_hours = browser.find_element(
             "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[4]/div/div[3]/div/div/input",
+            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[4]/div/div[3]/div/div/input",
         )
         idle_hours.send_keys("0")
         training_hours = browser.find_element(
             "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[5]/div/div[3]/div/div/input",
+            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[5]/div/div[3]/div/div/input",
         )
         training_hours.send_keys("0")
         tool_issues = browser.find_element(
             "xpath",
-            "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[2]/div[6]/div/div[3]/div/div/input",
+            "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[2]/div[6]/div/div[3]/div/div/input",
         )
         tool_issues.send_keys("0")
 
@@ -83,7 +83,7 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             # find submit button and click submit
             submit = browser.find_element(
                 "xpath",
-                "/html/body/div/div/div/div/div[1]/div/div[1]/div[2]/div[3]/div[1]/button/div",
+                "/html/body/div[1]/div/div/div/div[1]/div/div/div[1]/div[2]/div[3]/div[1]/button/div",
             )
             submit.click()
         browser.implicitly_wait(5)
