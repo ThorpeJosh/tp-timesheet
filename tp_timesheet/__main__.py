@@ -6,6 +6,7 @@ import argparse
 import warnings
 import selenium
 import regex as re
+import docker
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
@@ -116,13 +117,13 @@ def run():
 
     try:
         docker_handler = DockerHandler()
-    except Exception as e:  # to catch when Docker fails
-        if re.search(".*\n", str(e)):
-            message = re.search(".*\n", str(e))
-            print(message[0])
+    except docker.errors.DockerException as d_exception:
+        if re.search(".*\n", str(d_exception)):
+            message = re.search(".*\n", str(d_exception))
+            logger.error(message[0])
         else:
-            message = e
-            print(message)
+            message = d_exception
+            logger.error(message)
         notification_text = (
             "⚠️ TP-timesheet submitted not successfully. Check if Docker is running"
         )
@@ -156,27 +157,27 @@ def run():
                 notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
             if args.dry_run:
                 notification_text = f"[DRY_RUN] {notification_text}"
-        os.system(
-            f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
-        )
-    except selenium.common.exceptions.NoSuchElementException as e:
-        if re.search(".*\n", str(e)):
-            message = re.search(".*\n", str(e))
-            print(message[0])
+            os.system(
+                f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
+            )
+    except selenium.common.exceptions.NoSuchElementException as s_exception:
+        if re.search(".*\n", str(s_exception)):
+            message = re.search(".*\n", str(s_exception))
+            logger.error(message[0])
         else:
-            message = e
-            print(message)
+            message = s_exception
+            logger.error(message)
         notification_text = "⚠️ TP Timesheet was not submitted successfully. An element on the url was not found by Selenium"
         os.system(
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" default button "OK" with icon 2'"""
         )
-    except Exception as e:
-        if re.search(".*\n", str(e)):
-            message = re.search(".*\n", str(e))
-            print(message[0])
+    except Exception as gen_exception:
+        if re.search(".*\n", str(gen_exception)):
+            message = re.search(".*\n", str(gen_exception))
+            logger.error(message[0])
         else:
-            message = e
-            print(message)
+            message = gen_exception
+            logger.error(message)
         notification_text = "⚠️ TP Timesheet was not submitted successfully."
         os.system(
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" default button "OK" with icon 2'"""
