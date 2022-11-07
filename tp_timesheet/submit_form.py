@@ -33,17 +33,11 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
         browser.implicitly_wait(5)
 
         # find the email field element and fill your email
-        email_field = browser.find_element(
-            By.XPATH,
-            "(//input)[1]",
-        )
+        email_field = browser.find_element(By.XPATH, "(//input)[1]",)
         email_field.send_keys(email)
 
         # find the date field and fill date
-        date_field = browser.find_element(
-            By.XPATH,
-            "(//input)[2]",
-        )
+        date_field = browser.find_element(By.XPATH, "(//input)[2]",)
         date_field.send_keys(date.strftime("%m/%d/%Y"))
 
         if verbose:
@@ -57,35 +51,20 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             image.show()
 
         # find and fill in live hours
-        live_hours = browser.find_element(
-            By.XPATH,
-            "(//input)[3]",
-        )
+        live_hours = browser.find_element(By.XPATH, "(//input)[3]",)
         live_hours.send_keys(working_hours)
 
         # find and fill in the rest of the hours
-        idle_hours = browser.find_element(
-            By.XPATH,
-            "(//input)[4]",
-        )
+        idle_hours = browser.find_element(By.XPATH, "(//input)[4]",)
         idle_hours.send_keys("0")
-        training_hours = browser.find_element(
-            By.XPATH,
-            "(//input)[5]",
-        )
+        training_hours = browser.find_element(By.XPATH, "(//input)[5]",)
         training_hours.send_keys("0")
-        tool_issues = browser.find_element(
-            By.XPATH,
-            "(//input)[6]",
-        )
+        tool_issues = browser.find_element(By.XPATH, "(//input)[6]",)
         tool_issues.send_keys("0")
 
         if not dry_run:
             # find submit button and click submit
-            submit = browser.find_element(
-                By.XPATH,
-                "(//button)[2]/div[1]",
-            )
+            submit = browser.find_element(By.XPATH, "(//button)[2]/div[1]",)
             submit.click()
         browser.implicitly_wait(5)
 

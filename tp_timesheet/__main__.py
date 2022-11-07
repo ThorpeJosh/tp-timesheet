@@ -16,6 +16,18 @@ from tp_timesheet.config import Config
 logger = logging.getLogger(__name__)
 
 
+# pylint: disable=unnecessary-pass
+class TpException(Exception):
+    """
+    Exceptions to be raised, particularly when docker or selenium processes fail
+    """
+
+    pass
+
+
+# pylint: enable=unnecessary-pass
+
+
 def parse_args():
     """Parse arguments from the command line"""
     parser = argparse.ArgumentParser(
@@ -72,111 +84,111 @@ def parse_args():
 
 
 def run():
+    # pylint: disable=line-too-long
+    # pylint: disable=unused-variable
+    # pylint: disable=broad-except
     """Entry point"""
     args = parse_args()
+    notification_text = None
 
     config = Config(verbose=args.verbose)
-    # Automate Mode
-    if args.automate is not None:
-        valid_options = ["weekdays"]
-        if args.automate not in valid_options:
-            logger.error(
-                "'%s' is not a valid option for --automate mode", args.automate
+    try:
+        # Automate Mode
+        if args.automate is not None:
+            valid_options = ["weekdays"]
+            if args.automate not in valid_options:
+                logger.error(
+                    "'%s' is not a valid option for --automate mode", args.automate
+                )
+                return
+            scheduler = ScheduleForm()
+            scheduler.schedule()
+            return
+
+        # Normal Mode
+        if not args.verbose:
+            warnings.filterwarnings(
+                "ignore", message="Please take note that, due to arbitrary decisions, "
+            )
+        cal = Singapore()
+
+        start_date = get_start_date(args.start)
+        if not assert_start_date(start_date):
+            logger.critical("Start date failed sanity check. Aborting program")
+        sys.exit(1)
+        dates = get_working_dates(
+            start=start_date, count=args.count, cal=cal, working_hours=args.hours
+        )
+
+        if not dates:
+            logger.info(
+                "Submitted dates fall on weekends, form submission is not required."
             )
             return
-        scheduler = ScheduleForm()
-        scheduler.schedule()
-        return
 
-    # Normal Mode
-    if not args.verbose:
-        warnings.filterwarnings(
-            "ignore", message="Please take note that, due to arbitrary decisions, "
-        )
-    cal = Singapore()
-
-    start_date = get_start_date(args.start)
-    if not assert_start_date(start_date):
-        logger.critical("Start date failed sanity check. Aborting program")
-        sys.exit(1)
-    dates = get_working_dates(
-        start=start_date, count=args.count, cal=cal, working_hours=args.hours
-    )
-
-    if not dates:
+        string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
         logger.info(
-            "Submitted dates fall on weekends, form submission is not required."
+            "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
         )
-        return
 
-    string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
-    logger.info(
-        "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
-    )
+        try:
+            docker_handler = DockerHandler()
+        except docker.errors.DockerException as d_exception:
+            notification_text = "⚠️ TP-timesheet was not submitted successfully. Check if Docker is running"
+            raise TpException(notification_text) from d_exception
+        try:
+            logger.debug("Pulling latest image")
+            docker_handler.pull_image()
+            logger.debug("Launching docker container for selenium backend")
+            docker_handler.run_container()
 
-    try:
-        docker_handler = DockerHandler()
-    except docker.errors.DockerException as d_exception:
-        message = d_exception
-        logger.exception(message)
-        notification_text = (
-            "⚠️ TP-timesheet submitted not successfully. Check if Docker is running"
-        )
-        os.system(
-            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-            		default button "OK" with icon 2'"""
-        )
-        return
-    try:
-        logger.debug("Pulling latest image")
-        docker_handler.pull_image()
-        logger.debug("Launching docker container for selenium backend")
-        docker_handler.run_container()
-
-        for (date, hours) in dates:
-            submit_timesheet(
-                config.URL,
-                config.EMAIL,
-                date,
-                verbose=args.verbose,
-                dry_run=args.dry_run,
-                working_hours=hours,
-            )
-
-        # Notification (OSX only)
-        if args.notification and sys.platform.lower() == "darwin":
-            if len(dates) == 1:
-                notification_text = (
-                    f"Timesheet for {args.start.lower()} is successfully submitted."
+            for (date, hours) in dates:
+                submit_timesheet(
+                    config.URL,
+                    config.EMAIL,
+                    date,
+                    verbose=args.verbose,
+                    dry_run=args.dry_run,
+                    working_hours=hours,
                 )
-            else:
-                notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
-            if args.dry_run:
-                notification_text = f"[DRY_RUN] {notification_text}"
-            os.system(
-                f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
-            )
-    except selenium.common.exceptions.NoSuchElementException as s_exception:
-        logger.error(s_exception)
-        notification_text = "⚠️ TP Timesheet was not submitted successfully. An element on the url was not \
-        		found by Selenium"
-        os.system(
-            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-            		default button "OK" with icon 2'"""
-        )
+
+            # Notification (OSX only)
+            if args.notification and sys.platform.lower() == "darwin":
+                if len(dates) == 1:
+                    notification_text = (
+                        f"Timesheet for {args.start.lower()} is successfully submitted."
+                    )
+                else:
+                    notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
+                if args.dry_run:
+                    notification_text = f"[DRY_RUN] {notification_text}"
+                os.system(
+                    f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
+                )
+        except selenium.common.exceptions.NoSuchElementException as s_exception:
+            notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
+was not found by Selenium"
+            raise TpException(notification_text) from s_exception
     except Exception as gen_exception:
-        logger.error(gen_exception)
-        notification_text = "⚠️ TP Timesheet was not submitted successfully."
+        logger.error(gen_exception, exc_info=True)
+        if not notification_text:
+            notification_text = "⚠️ TP Timesheet was not submitted successfully."
         os.system(
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-            		default button "OK" with icon 2'"""
+                    default button "OK" with icon 2'"""
         )
-
     finally:
-        logger.debug("Cleaning up docker container")
-        if docker_handler.container is not None:
-            docker_handler.rm_container()
+        try:
+            logger.debug("Cleaning up docker container")
+            if docker_handler.container is not None:
+                docker_handler.rm_container()
+        except Exception as clean_exception:
+            pass
+        # pylint: enable=unused-variable
 
+
+# pylint: enable=broad-except
+# pylint: enable=line-too-long
 
 if __name__ == "__main__":
     run()
