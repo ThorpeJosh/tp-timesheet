@@ -28,6 +28,8 @@ def get_start_date(start_date_arg: str) -> datetime:
     """parse user's `start` argument"""
     if start_date_arg.lower() == "today":
         start_date = datetime.today()
+    elif start_date_arg.lower() == "yesterday":
+        start_date = datetime.today() - timedelta(days=1)
     else:
         # PR#22 Parsing Dates with dateutil
         numbers = re.split("[-/ ]", start_date_arg)
