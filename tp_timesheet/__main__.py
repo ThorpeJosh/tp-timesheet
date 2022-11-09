@@ -43,6 +43,12 @@ def parse_args():
         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week",
     )
     parser.add_argument(
+        "--hours",
+        type=int,
+        default=8,
+        help="Number of hours to submit. Default=8",
+    )
+    parser.add_argument(
         "-n",
         "--notification",
         action="store_true",
