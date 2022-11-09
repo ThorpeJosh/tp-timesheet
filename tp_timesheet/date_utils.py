@@ -1,10 +1,13 @@
 """ Module containing methods to process `date` related """
 import re
+from typing import List, Tuple
 from datetime import datetime, timedelta
 import dateutil.parser
 
 
-def get_working_dates(start, count, cal):
+def get_working_dates(
+    start: datetime, count: int, cal, working_hours: int
+) -> List[Tuple[datetime, int]]:
     """get workdays from `start` date to `start+count` date"""
     working_dates = []
     for i in range(count):
@@ -15,13 +18,13 @@ def get_working_dates(start, count, cal):
         holidates = [date for (date, _) in holidays]
         if current_date.isoweekday() < 6:
             if current_date not in holidates:
-                working_dates.append((current_date, 8))  # 8: number of working hours
+                working_dates.append((current_date, working_hours))
             else:
                 working_dates.append((current_date, 0))  # 0: number of working hours
     return working_dates
 
 
-def get_start_date(start_date_arg):
+def get_start_date(start_date_arg: str) -> datetime:
     """parse user's `start` argument"""
     if start_date_arg.lower() == "today":
         start_date = datetime.today()

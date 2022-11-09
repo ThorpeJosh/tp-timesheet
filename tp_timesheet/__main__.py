@@ -94,7 +94,9 @@ def run():
     cal = Singapore()
 
     start_date = get_start_date(args.start)
-    dates = get_working_dates(start=start_date, count=args.count, cal=cal)
+    dates = get_working_dates(
+        start=start_date, count=args.count, cal=cal, working_hours=args.hours
+    )
 
     if not dates:
         logger.info(
