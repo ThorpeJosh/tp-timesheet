@@ -1,0 +1,76 @@
+pipeline {
+    agent { label 'docker && linux' }
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+    }
+    environment {
+        DOCKER_IMAGE = 'python'
+        DOCKER_TAG = '3.11-slim'
+        PYPI_CREDS = credentials('PyPiCredentials')
+        TWINE_USERNAME = "${PYPI_CREDS_USR}"
+        TWINE_PASSWORD = "${PYPI_CREDS_PSW}"
+    }
+    stages {
+        stage('Publish Pipeline') {
+            agent {
+                docker {
+                    image "${DOCKER_IMAGE}:${DOCKER_TAG}"
+                    args '-e "HOME=$WORKSPACE"'
+                }
+            }
+            when {
+                tag "v*"
+            }
+            stages {
+                stage('Python Environment') {
+                    options {
+                        timeout(time: 5, unit: 'MINUTES')
+                    }
+                    steps {
+                        echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                        sh '''
+                        python -m venv venv
+                        . venv/bin/activate
+                        pip install --upgrade pip
+                        pip install .
+                        '''
+                    }
+                }
+                stage('Build Package') {
+                    options {
+                        timeout(time: 30, unit: 'SECONDS')
+                    }
+                    steps {
+                        echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                        sh '''
+                        . venv/bin/activate
+                        python -m build
+                        '''
+                    }
+                }
+                stage('Publish') {
+                    options {
+                        timeout(time: 1, unit: 'MINUTES')
+                    }
+                    steps {
+                        echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                        sh '''
+                        . venv/bin/activate
+                        twine upload dist/*
+                        '''
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs(cleanWhenNotBuilt: false,
+                    deleteDirs: true,
+                    disableDeferredWipeout: true,
+                    notFailBuild: true,
+                    patterns: [[pattern: '.gitignore', type: 'INCLUDE'],
+                               [pattern: '.propsfile', type: 'EXCLUDE']])
+        }
+    }
+}
