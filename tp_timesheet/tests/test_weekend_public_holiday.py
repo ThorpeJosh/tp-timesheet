@@ -28,7 +28,7 @@ def test_working_dates():
     test dates account for weekends and holidays correctly
     """
     for start_date, count, expected_result in TEST_CASES:
-        res = get_working_dates(start_date, count, cal)
+        res = get_working_dates(start_date, count, cal, working_hours=8)
         assert (
             res == expected_result
         ), f"Error, expected: {expected_result}, result:{res}"
