@@ -170,13 +170,14 @@ def run():
 was not found by Selenium"
             raise TpException(notification_text) from s_exception
     except Exception as gen_exception:
-        logger.error(gen_exception, exc_info=True)
+        logger.critical(gen_exception, exc_info=True)
         if not notification_text:
             notification_text = "⚠️ TP Timesheet was not submitted successfully."
         os.system(
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
         )
+        sys.exit(1)
     finally:
         try:
             logger.debug("Cleaning up docker container")
