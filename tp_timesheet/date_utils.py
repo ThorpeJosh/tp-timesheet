@@ -1,14 +1,15 @@
 """ Module containing methods to process `date` related """
 import re
 from typing import List, Tuple
+import datetime
 from datetime import datetime, timedelta
 import dateutil.parser
 from tp_timesheet.config import Config
 
 
 def get_working_dates(
-    start: datetime, count: int, cal, working_hours: int
-) -> List[Tuple[datetime, int]]:
+    start: datetime.date, count: int, cal, working_hours: int
+) -> List[Tuple[datetime.date, int]]:
     """get workdays from `start` date to `start+count` date"""
     working_dates = []
     for i in range(count):
@@ -24,7 +25,7 @@ def get_working_dates(
     return working_dates
 
 
-def get_start_date(start_date_arg: str) -> datetime:
+def get_start_date(start_date_arg: str) -> datetime.date:
     """parse user's `start` argument"""
     if start_date_arg.lower() == "today":
         start_date = datetime.today().date()
@@ -55,10 +56,14 @@ def get_start_date(start_date_arg: str) -> datetime:
     return start_date
 
 
-def assert_start_date(start_date):
+def assert_start_date(start_date: datetime.date) -> bool:
     """
     check the start date submitting is bounded within `n` days.
     parse `n` from config file. default : 7
+
+    Returns:
+        True: when date is ok or verified by user as ok
+        False: when date is invalid and confirmed by user as invalid
     """
     start_date_str = start_date.strftime("%d/%m/%Y")
     today = datetime.today().date()
