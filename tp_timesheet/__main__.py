@@ -95,7 +95,8 @@ def run():
 
     start_date = get_start_date(args.start)
     if not assert_start_date(start_date):
-        sys.exit()
+        logger.critical("Start date failed sanity check. Aborting program")
+        sys.exit(1)
     dates = get_working_dates(
         start=start_date, count=args.count, cal=cal, working_hours=args.hours
     )

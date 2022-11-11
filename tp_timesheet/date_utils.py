@@ -62,7 +62,10 @@ def assert_start_date(start_date):
     """
     start_date_str = start_date.strftime("%d/%m/%Y")
     today = datetime.today().date()
-    if Config.SANITY_CHECK_START_DATE and int(Config.SANITY_CHECK_RANGE) < abs(today - start_date).days:
+    if (
+        Config.SANITY_CHECK_START_DATE
+        and int(Config.SANITY_CHECK_RANGE) < abs(today - start_date).days
+    ):
         user_confirm = input(
             f"The entered date '{start_date_str}' "
             f"is beyond the maximum '{Config.SANITY_CHECK_RANGE}' day window from today.\n"
@@ -72,6 +75,5 @@ def assert_start_date(start_date):
             f"Do you want to submit the timesheet anyway? [y/N]: "
         )
         if user_confirm.lower() != "y":
-            print("Aborted. Please re-start the program and pass new dates to process.")
             return False
     return True
