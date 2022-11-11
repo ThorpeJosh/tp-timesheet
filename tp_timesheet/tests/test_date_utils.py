@@ -3,6 +3,7 @@ import os
 import sys
 import builtins
 from datetime import datetime, timedelta
+import pytest
 import mock
 from tp_timesheet.date_utils import get_start_date, assert_start_date
 from tp_timesheet.config import Config
@@ -10,6 +11,7 @@ from tp_timesheet.config import Config
 tests_path = os.path.dirname(os.path.abspath(__file__))
 src_path = tests_path + "/../"
 sys.path.insert(0, src_path)
+
 
 # fmt: off
 TEST_CASES_FORMATS_DMY = [
@@ -111,11 +113,30 @@ def test_various_date_formats():
             ), f"parsing error, query:{query_str} and parsed:{parsed}"
 
 
-def test_assert_start_date():
+@pytest.fixture(name="tmp_config")
+def fixture_create_tmp_config():
+    """
+    Creates a tmp config file prior to running a test that uses this fixture.
+    It then cleans up the tmp file after the test has run
+    """
+    # Fake config loaded by pytest
+    test_config_path = Config.CONFIG_DIR.joinpath("tmp_pytest.conf")
+    config_str = """
+[configuration]
+tp_email = fake@email.com
+tp_url = https://example.com/path
+    """
+    with open(test_config_path, "w", encoding="utf8") as conf_file:
+        conf_file.write(config_str)
+    yield test_config_path
+    os.remove(test_config_path)
+
+
+def test_assert_start_date(tmp_config):
     """
     test the assert function of start date
     """
-    Config()
+    Config(config_filename=tmp_config)
 
     date_range = int(Config.SANITY_CHECK_RANGE)
     today = datetime.today().date()
