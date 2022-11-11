@@ -35,10 +35,7 @@ class Config:
 
         cls.sanity_check_bool_dict = {"sanity_check_start_date": "True"}
         cls.sanity_check_range_dict = {"sanity_check_range": "7"}
-        cls.DEFAULT_CONF = {
-            **cls.sanity_check_bool_dict,
-            **cls.sanity_check_range_dict
-        }
+        cls.DEFAULT_CONF = {**cls.sanity_check_bool_dict, **cls.sanity_check_range_dict}
 
         # Initialize root logger
         cls.init_logger()
@@ -49,8 +46,12 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
-        cls.SANITY_CHECK_START_DATE = config.get("configuration", next(iter(cls.sanity_check_bool_dict)))
-        cls.SANITY_CHECK_RANGE = config.get("configuration", next(iter(cls.sanity_check_range_dict)))
+        cls.SANITY_CHECK_START_DATE = config.get(
+            "configuration", next(iter(cls.sanity_check_bool_dict))
+        )
+        cls.SANITY_CHECK_RANGE = config.get(
+            "configuration", next(iter(cls.sanity_check_range_dict))
+        )
 
     @classmethod
     def init_logger(cls):
