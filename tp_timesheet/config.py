@@ -23,15 +23,13 @@ class Config:
     LOG_PATH = LOG_DIR.joinpath("tp.logs")
 
     @classmethod
-    def __init__(cls, url=None, email=None, verbose=False):
+    def __init__(cls, verbose=False, config_filename="tp.conf"):
         """This is the entry point for the class and running this will setup the tp-timesheet
         config and make all the necesarry globals available
         """
-        cls.URL = url
-        cls.EMAIL = email
         cls.VERBOSE = verbose
         cls.CONFIG_DIR = Config.CONFIG_DIR
-        cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
+        cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath(config_filename)
 
         cls.sanity_check_bool_dict = {"sanity_check_start_date": "True"}
         cls.sanity_check_range_dict = {"sanity_check_range": "7"}
