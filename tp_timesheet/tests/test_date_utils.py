@@ -116,25 +116,28 @@ def test_assert_start_date():
     test the assert function of start date
     """
     Config()
-    Config.CHECK_MAX_DAYS = True
 
-    testing_span = 2 * int(Config.SANITY_CHECK_RANGE)
+    date_range = int(Config.SANITY_CHECK_RANGE)
     today = datetime.today().date()
 
+    # Test date is valid or user has confirmed to proceed
     with mock.patch.object(builtins, "input", lambda _: "y"):
-        for delta in range(-1 * testing_span, testing_span + 1):
+        for delta in range(-5 * date_range, 5 * date_range):
             assertion_result = assert_start_date(today + timedelta(delta))
             assert assertion_result, "start date assertion failed"
 
     with mock.patch.object(builtins, "input", lambda _: "n"):
-        for delta in range(-1 * testing_span, -1 * int(Config.SANITY_CHECK_RANGE)):
+        # Test invalid dates and user has chosen not to proceed
+        for delta in range(-5 * date_range, -1 * date_range):
             assertion_result = assert_start_date(today + timedelta(delta))
             assert not assertion_result, "start date assertion failed"
 
-        for delta in range(-1 * int(Config.SANITY_CHECK_RANGE), int(Config.SANITY_CHECK_RANGE) + 1):
+        # Test invalid dates and user has chosen not to proceed
+        for delta in range(date_range + 1, 5 * date_range):
+            assertion_result = assert_start_date(today + timedelta(delta))
+            assert not assertion_result, "start date assertion failed"
+
+        # Test date is valid, requires no input from user (**Will fail if it prompts user)
+        for delta in range(-1 * date_range, date_range + 1):
             assertion_result = assert_start_date(today + timedelta(delta))
             assert assertion_result, "start date assertion failed"
-
-        for delta in range(int(Config.SANITY_CHECK_RANGE) + 1, testing_span + 1):
-            assertion_result = assert_start_date(today + timedelta(delta))
-            assert not assertion_result, "start date assertion failed"
