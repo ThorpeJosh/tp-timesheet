@@ -33,7 +33,12 @@ class Config:
         cls.CONFIG_DIR = Config.CONFIG_DIR
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath("tp.conf")
 
-        cls.DEFAULT = {"check_max_days": "True", "max_submit_within_days": "7"}
+        cls.sanity_check_bool_dict = {"sanity_check_start_date": "True"}
+        cls.sanity_check_range_dict = {"sanity_check_range": "7"}
+        cls.DEFAULT_CONF = {
+            **cls.sanity_check_bool_dict,
+            **cls.sanity_check_range_dict
+        }
 
         # Initialize root logger
         cls.init_logger()
@@ -44,8 +49,8 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
-        cls.MAX_DAYS = config.get("configuration", "max_submit_within_days")
-        cls.CHECK_MAX_DAYS = config.get("configuration", "check_max_days")
+        cls.SANITY_CHECK_START_DATE = config.get("configuration", next(iter(cls.sanity_check_bool_dict)))
+        cls.SANITY_CHECK_RANGE = config.get("configuration", next(iter(cls.sanity_check_range_dict)))
 
     @classmethod
     def init_logger(cls):
@@ -109,9 +114,7 @@ class Config:
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
-                "check_max_days": "True",
-                "max_submit_within_days": 7,
-            }
+            }.update(cls.DEFAULT_CONF)
 
             with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
                 config.write(config_file)
@@ -123,7 +126,7 @@ class Config:
         input_config.read(cls.CONFIG_PATH)
 
         # Version compatibility (#20)
-        for config_key, config_value in cls.DEFAULT.items():
+        for config_key, config_value in cls.DEFAULT_CONF.items():
             if not input_config.has_option("configuration", config_key):
                 input_config.set("configuration", config_key, config_value)
 

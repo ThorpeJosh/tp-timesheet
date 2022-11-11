@@ -13,7 +13,6 @@ def get_working_dates(
     working_dates = []
     for i in range(count):
         current_date = start + timedelta(days=i)
-        current_date = current_date.date()
         year = current_date.year
         holidays = cal.holidays(year)
         holidates = [date for (date, _) in holidays]
@@ -63,13 +62,13 @@ def assert_start_date(start_date):
     """
     start_date_str = start_date.strftime("%d/%m/%Y")
     today = datetime.today().date()
-    if Config.CHECK_MAX_DAYS and int(Config.MAX_DAYS) < abs(today - start_date).days:
+    if Config.SANITY_CHECK_START_DATE and int(Config.SANITY_CHECK_RANGE) < abs(today - start_date).days:
         user_confirm = input(
             f"The entered date '{start_date_str}' "
-            f"is beyond the maximum '{Config.MAX_DAYS}' day window from today.\n"
+            f"is beyond the maximum '{Config.SANITY_CHECK_RANGE}' day window from today.\n"
             f"You can modify the threshold and/or disable this confirmation option from '{Config.CONFIG_PATH}'.\n"
-            f" - To modify threshold, change value of 'max_submit_within_days'.\n"
-            f" - To disable, pass 'False' to 'check_max_days'.\n"
+            f" - To modify threshold, change value of '{next(iter(Config.sanity_check_range_dict))}'.\n"
+            f" - To disable, pass 'False' to '{next(iter(Config.sanity_check_bool_dict))}'.\n"
             f"Do you want to submit the timesheet anyway? [y/N]: "
         )
         if user_confirm.lower() != "y":

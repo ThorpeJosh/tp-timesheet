@@ -118,7 +118,7 @@ def test_assert_start_date():
     Config()
     Config.CHECK_MAX_DAYS = True
 
-    testing_span = 2 * int(Config.MAX_DAYS)
+    testing_span = 2 * int(Config.SANITY_CHECK_RANGE)
     today = datetime.today().date()
 
     with mock.patch.object(builtins, "input", lambda _: "y"):
@@ -127,14 +127,14 @@ def test_assert_start_date():
             assert assertion_result, "start date assertion failed"
 
     with mock.patch.object(builtins, "input", lambda _: "n"):
-        for delta in range(-1 * testing_span, -1 * int(Config.MAX_DAYS)):
+        for delta in range(-1 * testing_span, -1 * int(Config.SANITY_CHECK_RANGE)):
             assertion_result = assert_start_date(today + timedelta(delta))
             assert not assertion_result, "start date assertion failed"
 
-        for delta in range(-1 * int(Config.MAX_DAYS), int(Config.MAX_DAYS) + 1):
+        for delta in range(-1 * int(Config.SANITY_CHECK_RANGE), int(Config.SANITY_CHECK_RANGE) + 1):
             assertion_result = assert_start_date(today + timedelta(delta))
             assert assertion_result, "start date assertion failed"
 
-        for delta in range(int(Config.MAX_DAYS) + 1, testing_span + 1):
+        for delta in range(int(Config.SANITY_CHECK_RANGE) + 1, testing_span + 1):
             assertion_result = assert_start_date(today + timedelta(delta))
             assert not assertion_result, "start date assertion failed"
