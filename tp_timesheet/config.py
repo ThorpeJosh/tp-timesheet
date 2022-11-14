@@ -22,6 +22,11 @@ class Config:
     LOG_DIR.mkdir(exist_ok=True)
     LOG_PATH = LOG_DIR.joinpath("tp.logs")
 
+    # config parameters (need to be accessible to tests without invoking __init__)
+    sanity_check_bool_dict = {"sanity_check_start_date": "True"}
+    sanity_check_range_dict = {"sanity_check_range": "7"}
+    DEFAULT_CONF = {**sanity_check_bool_dict, **sanity_check_range_dict}
+
     @classmethod
     def __init__(cls, verbose=False, config_filename="tp.conf"):
         """This is the entry point for the class and running this will setup the tp-timesheet
@@ -30,10 +35,6 @@ class Config:
         cls.VERBOSE = verbose
         cls.CONFIG_DIR = Config.CONFIG_DIR
         cls.CONFIG_PATH = cls.CONFIG_DIR.joinpath(config_filename)
-
-        cls.sanity_check_bool_dict = {"sanity_check_start_date": "True"}
-        cls.sanity_check_range_dict = {"sanity_check_range": "7"}
-        cls.DEFAULT_CONF = {**cls.sanity_check_bool_dict, **cls.sanity_check_range_dict}
 
         # Initialize root logger
         cls.init_logger()
