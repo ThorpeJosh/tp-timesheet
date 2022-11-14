@@ -16,16 +16,10 @@ from tp_timesheet.config import Config
 logger = logging.getLogger(__name__)
 
 
-# pylint: disable=unnecessary-pass
 class TpException(Exception):
     """
     Exceptions to be raised, particularly when docker or selenium processes fail
     """
-
-    pass
-
-
-# pylint: enable=unnecessary-pass
 
 
 def parse_args():
@@ -84,9 +78,6 @@ def parse_args():
 
 
 def run():
-    # pylint: disable=line-too-long
-    # pylint: disable=unused-variable
-    # pylint: disable=broad-except
     """Entry point"""
     args = parse_args()
     notification_text = None
@@ -115,7 +106,7 @@ def run():
         start_date = get_start_date(args.start)
         if not assert_start_date(start_date):
             logger.critical("Start date failed sanity check. Aborting program")
-        sys.exit(1)
+            sys.exit(1)
         dates = get_working_dates(
             start=start_date, count=args.count, cal=cal, working_hours=args.hours
         )
@@ -169,7 +160,7 @@ def run():
             notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
 was not found by Selenium"
             raise TpException(notification_text) from s_exception
-    except Exception as gen_exception:
+    except Exception as gen_exception:  # pylint: disable=broad-except
         logger.critical(gen_exception, exc_info=True)
         if not notification_text:
             notification_text = "⚠️ TP Timesheet was not submitted successfully."
@@ -177,19 +168,22 @@ was not found by Selenium"
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
         )
-        sys.exit(1)
     finally:
         try:
             logger.debug("Cleaning up docker container")
             if docker_handler.container is not None:
                 docker_handler.rm_container()
-        except Exception as clean_exception:
-            pass
-        # pylint: enable=unused-variable
+        except NameError as clean_exception:
+            notification_text = "Ran into an unexpected error while attempting to clean up docker container"
+            logger.critical(clean_exception, exc_info=True)
+            os.system(
+                f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+            )
+            raise TpException(notification_text) from clean_exception
+        except Exception as gen_exception:  # pylint: disable=broad-except
+            logger.critical(gen_exception, exc_info=True)
 
-
-# pylint: enable=broad-except
-# pylint: enable=line-too-long
 
 if __name__ == "__main__":
     run()
