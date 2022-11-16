@@ -16,12 +16,6 @@ from tp_timesheet.config import Config
 logger = logging.getLogger(__name__)
 
 
-class TpException(Exception):
-    """
-    Exceptions to be raised, particularly when docker or selenium processes fail
-    """
-
-
 def parse_args():
     """Parse arguments from the command line"""
     parser = argparse.ArgumentParser(
@@ -81,6 +75,7 @@ def run():
     """Entry point"""
     args = parse_args()
     notification_text = None
+    docker_handler = None
 
     config = Config(verbose=args.verbose)
     try:
@@ -122,48 +117,55 @@ def run():
             "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
         )
 
-        try:
-            docker_handler = DockerHandler()
-        except docker.errors.DockerException as d_exception:
-            notification_text = "⚠️ TP-timesheet was not submitted successfully. Check if Docker is running"
-            raise TpException(notification_text) from d_exception
-        try:
-            logger.debug("Pulling latest image")
-            docker_handler.pull_image()
-            logger.debug("Launching docker container for selenium backend")
-            docker_handler.run_container()
+        docker_handler = DockerHandler()
+        logger.debug("Pulling latest image")
+        docker_handler.pull_image()
+        logger.debug("Launching docker container for selenium backend")
+        docker_handler.run_container()
 
-            for (date, hours) in dates:
-                submit_timesheet(
-                    config.URL,
-                    config.EMAIL,
-                    date,
-                    verbose=args.verbose,
-                    dry_run=args.dry_run,
-                    working_hours=hours,
-                )
+        for (date, hours) in dates:
+            submit_timesheet(
+                config.URL,
+                config.EMAIL,
+                date,
+                verbose=args.verbose,
+                dry_run=args.dry_run,
+                working_hours=hours,
+            )
 
-            # Notification (OSX only)
-            if args.notification and sys.platform.lower() == "darwin":
-                if len(dates) == 1:
-                    notification_text = (
-                        f"Timesheet for {args.start.lower()} is successfully submitted."
-                    )
-                else:
-                    notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
-                if args.dry_run:
-                    notification_text = f"[DRY_RUN] {notification_text}"
-                os.system(
-                    f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
+        # Notification (OSX only)
+        if args.notification and sys.platform.lower() == "darwin":
+            if len(dates) == 1:
+                notification_text = (
+                    f"Timesheet for {args.start.lower()} is successfully submitted."
                 )
-        except selenium.common.exceptions.NoSuchElementException as s_exception:
-            notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
+            else:
+                notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
+            if args.dry_run:
+                notification_text = f"[DRY_RUN] {notification_text}"
+            os.system(
+                f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
+            )
+    except docker.errors.DockerException:
+        notification_text = (
+            "⚠️ TP-timesheet was not submitted successfully. Check if Docker is running"
+        )
+        logger.critical(notification_text, exc_info=True)
+        os.system(
+            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+        )
+    except selenium.common.exceptions.NoSuchElementException:
+        notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
 was not found by Selenium"
-            raise TpException(notification_text) from s_exception
-    except Exception as gen_exception:  # pylint: disable=broad-except
-        logger.critical(gen_exception, exc_info=True)
-        if not notification_text:
-            notification_text = "⚠️ TP Timesheet was not submitted successfully."
+        logger.critical(notification_text, exc_info=True)
+        os.system(
+            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+        )
+    except Exception:  # pylint: disable=broad-except
+        notification_text = "⚠️ TP Timesheet was not submitted successfully."
+        logger.critical(notification_text, exc_info=True)
         os.system(
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
@@ -171,18 +173,15 @@ was not found by Selenium"
     finally:
         try:
             logger.debug("Cleaning up docker container")
-            if docker_handler.container is not None:
+            if docker_handler is not None:
                 docker_handler.rm_container()
-        except NameError as clean_exception:
+        except Exception:  # pylint: disable=broad-except
             notification_text = "Ran into an unexpected error while attempting to clean up docker container"
-            logger.critical(clean_exception, exc_info=True)
+            logger.critical(notification_text, exc_info=True)
             os.system(
                 f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
             )
-            raise TpException(notification_text) from clean_exception
-        except Exception as gen_exception:  # pylint: disable=broad-except
-            logger.critical(gen_exception, exc_info=True)
 
 
 if __name__ == "__main__":
