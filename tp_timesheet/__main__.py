@@ -4,6 +4,8 @@ import os
 import sys
 import argparse
 import warnings
+import selenium
+import docker
 from workalendar.asia import Singapore
 from tp_timesheet.docker_handler import DockerHandler
 from tp_timesheet.submit_form import submit_timesheet
@@ -72,48 +74,50 @@ def parse_args():
 def run():
     """Entry point"""
     args = parse_args()
+    notification_text = None
+    docker_handler = None
 
     config = Config(verbose=args.verbose)
-    # Automate Mode
-    if args.automate is not None:
-        valid_options = ["weekdays"]
-        if args.automate not in valid_options:
-            logger.error(
-                "'%s' is not a valid option for --automate mode", args.automate
+    try:
+        # Automate Mode
+        if args.automate is not None:
+            valid_options = ["weekdays"]
+            if args.automate not in valid_options:
+                logger.error(
+                    "'%s' is not a valid option for --automate mode", args.automate
+                )
+                return
+            scheduler = ScheduleForm()
+            scheduler.schedule()
+            return
+
+        # Normal Mode
+        if not args.verbose:
+            warnings.filterwarnings(
+                "ignore", message="Please take note that, due to arbitrary decisions, "
+            )
+        cal = Singapore()
+
+        start_date = get_start_date(args.start)
+        if not assert_start_date(start_date):
+            logger.critical("Start date failed sanity check. Aborting program")
+            sys.exit(1)
+        dates = get_working_dates(
+            start=start_date, count=args.count, cal=cal, working_hours=args.hours
+        )
+
+        if not dates:
+            logger.info(
+                "Submitted dates fall on weekends, form submission is not required."
             )
             return
-        scheduler = ScheduleForm()
-        scheduler.schedule()
-        return
 
-    # Normal Mode
-    if not args.verbose:
-        warnings.filterwarnings(
-            "ignore", message="Please take note that, due to arbitrary decisions, "
-        )
-    cal = Singapore()
-
-    start_date = get_start_date(args.start)
-    if not assert_start_date(start_date):
-        logger.critical("Start date failed sanity check. Aborting program")
-        sys.exit(1)
-    dates = get_working_dates(
-        start=start_date, count=args.count, cal=cal, working_hours=args.hours
-    )
-
-    if not dates:
+        string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
         logger.info(
-            "Submitted dates fall on weekends, form submission is not required."
+            "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
         )
-        return
 
-    string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
-    logger.info(
-        "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
-    )
-
-    docker_handler = DockerHandler()
-    try:
+        docker_handler = DockerHandler()
         logger.debug("Pulling latest image")
         docker_handler.pull_image()
         logger.debug("Launching docker container for selenium backend")
@@ -142,11 +146,42 @@ def run():
             os.system(
                 f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
             )
-
+    except docker.errors.DockerException:
+        notification_text = (
+            "⚠️ TP-timesheet was not submitted successfully. Check if Docker is running"
+        )
+        logger.critical(notification_text, exc_info=True)
+        os.system(
+            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+        )
+    except selenium.common.exceptions.NoSuchElementException:
+        notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
+was not found by Selenium"
+        logger.critical(notification_text, exc_info=True)
+        os.system(
+            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+        )
+    except Exception:  # pylint: disable=broad-except
+        notification_text = "⚠️ TP Timesheet was not submitted successfully."
+        logger.critical(notification_text, exc_info=True)
+        os.system(
+            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+        )
     finally:
-        logger.debug("Cleaning up docker container")
-        if docker_handler.container is not None:
-            docker_handler.rm_container()
+        try:
+            logger.debug("Cleaning up docker container")
+            if docker_handler is not None:
+                docker_handler.rm_container()
+        except Exception:  # pylint: disable=broad-except
+            notification_text = "Ran into an unexpected error while attempting to clean up docker container"
+            logger.critical(notification_text, exc_info=True)
+            os.system(
+                f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+            )
 
 
 if __name__ == "__main__":
