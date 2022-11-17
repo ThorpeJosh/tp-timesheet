@@ -76,6 +76,7 @@ def run():
     args = parse_args()
     notification_text = None
     docker_handler = None
+    notification_flag = False
 
     config = Config(verbose=args.verbose)
 
@@ -166,6 +167,7 @@ was not found by Selenium"
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
         )
+        notification_flag = True
     except DockerHandlerException as error:
         notification_text = f"⚠️ TP-timesheet was not submitted successfully. {error}"
         logger.critical(notification_text, exc_info=True)
@@ -173,6 +175,7 @@ was not found by Selenium"
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
         )
+        notification_flag = True
     except Exception:  # pylint: disable=broad-except
         notification_text = "⚠️ TP Timesheet was not submitted successfully."
         logger.critical(notification_text, exc_info=True)
@@ -180,6 +183,7 @@ was not found by Selenium"
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
         )
+        notification_flag = True
     finally:
         try:
             logger.debug("Cleaning up docker container")
@@ -188,10 +192,12 @@ was not found by Selenium"
         except Exception:  # pylint: disable=broad-except
             notification_text = "Ran into an unexpected error while attempting to clean up docker container"
             logger.critical(notification_text, exc_info=True)
-            os.system(
-                f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-                    default button "OK" with icon 2'"""
-            )
+            if not notification_flag:
+                # Don't show two notifications sequentially
+                os.system(
+                    f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                        default button "OK" with icon 2'"""
+                )
 
 
 if __name__ == "__main__":

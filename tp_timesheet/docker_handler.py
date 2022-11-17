@@ -1,5 +1,6 @@
 """ Handler for running selenium and chrome backend """
 import os
+import sys
 import platform
 import subprocess
 import logging
@@ -102,7 +103,7 @@ class DockerHandler:
             )
             if brew_version.returncode != 0:
                 notification_text = (
-                    "Brew is not installed, docker cannot be installed automatically. "
+                    "Brew is not installed, so docker cannot be installed automatically. "
                     "Consider installing https://brew.sh/ or go to docker website to download "
                     "https://docs.docker.com/desktop/install/mac-install/"
                 )
@@ -113,8 +114,8 @@ class DockerHandler:
                 )
                 raise DockerHandlerException(notification_text) from exc
             user_confirm = input(
-                "\nDocker is not installed.\nWe have detected brew is installed though.\n"
-                "Would you like us to attempt to install docker using brew? [y/N]:"
+                "\nDocker is not installed.\n"
+                "Would you like to attempt to install docker using brew? [y/N]:"
             )
             if user_confirm.lower() != "y":
                 raise DockerHandlerException(
@@ -124,24 +125,19 @@ class DockerHandler:
             subprocess.run(
                 ["brew", "install", "--cask", "docker"],
                 check=True,
-                capture_output=True,
+                capture_output=False,
             )
             # Unfortunately docker needs to be launched from finder first time to finish the setup
             notification_text = (
-                "We just downloaded and installed docker with brew. To finish the docker setup, "
-                "run the docker application from within your Applications folder"
+                "Docker was installed with brew. To finish the docker setup, "
+                "run the docker application from within your Applications folder (will open automatically)"
             )
             os.system(
                 f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                         default button "OK" with icon 2'"""
             )
             os.system("open /Applications")
-            raise DockerHandlerException(
-                (
-                    "Docker installation via brew just finished. "
-                    "Requires user to finish docker install before tp-timesheet will work"
-                )
-            ) from exc
+            sys.exit(0)
 
         # Launch docker engine, does nothing if already running
         docker_open = subprocess.run(
