@@ -73,6 +73,7 @@ def parse_args():
 
 def run():
     """Entry point"""
+    # pylint: disable=too-many-statements
     args = parse_args()
     notification_text = None
     docker_handler = None

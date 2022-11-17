@@ -149,8 +149,8 @@ class DockerHandler:
             # Something unexpected happened. Capture stderror
             raise DockerHandlerException(docker_open.stderr.decode().strip())
 
-        # Check docker engine is running. Timeout after 20 seconds
-        for _ in range(10):
+        # Check docker engine is running. Timeout after 30 seconds
+        for _ in range(15):
             docker_stats = subprocess.run(
                 ["docker", "stats", "--no-stream"], check=False, capture_output=True
             )
