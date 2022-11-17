@@ -1,6 +1,9 @@
 """ Handler for running selenium and chrome backend """
+import os
 import platform
-from time import sleep
+import subprocess
+import logging
+import time
 import http
 import urllib
 import urllib3
@@ -9,6 +12,12 @@ from selenium import webdriver
 
 ARM_IMAGE = "seleniarm/standalone-chromium:105.0"
 X86_IMAGE = "selenium/standalone-chrome:105.0"
+
+logger = logging.getLogger(__name__)
+
+
+class DockerHandlerException(Exception):
+    """Exceptions for DockerHandler class"""
 
 
 class DockerHandler:
@@ -53,7 +62,7 @@ class DockerHandler:
                 raise RuntimeError(
                     "Selenium Docker API did not return a 200 code within 5 seconds"
                 )
-            sleep(1)
+            time.sleep(1)
 
         # Ensure chrome driver is responsive
         options = webdriver.ChromeOptions()
@@ -69,8 +78,92 @@ class DockerHandler:
                 pass
             if i == 4:
                 raise RuntimeError("Chrome Docker API did not respond within 5 seconds")
-            sleep(1)
+            time.sleep(1)
 
     def rm_container(self):
         """Remove the container"""
         self.container.remove(force=True)
+
+    @staticmethod
+    def install_and_launch_docker():
+        """Static method to ensure docker is installed and running.
+        If not then it will attempt to rectify the problems
+        """
+        # Check docker is installed
+        try:
+            subprocess.run(["docker", "--version"], check=True, capture_output=True)
+        except FileNotFoundError as exc:
+            logger.info(
+                "Docker is not installed properly on your system. Attempting to install with brew"
+            )
+            # Check brew is installed
+            brew_version = subprocess.run(
+                ["brew", "--version"], check=True, capture_output=True
+            )
+            if brew_version.returncode != 0:
+                notification_text = (
+                    "Brew is not installed, docker cannot be installed automatically. "
+                    "Consider installing https://brew.sh/ or go to docker website to download "
+                    "https://docs.docker.com/desktop/install/mac-install/"
+                )
+                logger.warning(notification_text)
+                os.system(
+                    f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                            default button "OK" with icon 2'"""
+                )
+                raise DockerHandlerException(notification_text) from exc
+            user_confirm = input(
+                "\nDocker is not installed.\nWe have detected brew is installed though.\n"
+                "Would you like us to attempt to install docker using brew? [y/N]:"
+            )
+            if user_confirm.lower() != "y":
+                raise DockerHandlerException(
+                    "Docker installation aborted by user"
+                ) from exc
+            logger.info("Installing docker with brew")
+            subprocess.run(
+                ["brew", "install", "--cask", "docker"],
+                check=True,
+                capture_output=True,
+            )
+            # Unfortunately docker needs to be launched from finder first time to finish the setup
+            notification_text = (
+                "We just downloaded and installed docker with brew. To finish the docker setup, "
+                "run the docker application from within your Applications folder"
+            )
+            os.system(
+                f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                        default button "OK" with icon 2'"""
+            )
+            os.system("open /Applications")
+            raise DockerHandlerException(
+                (
+                    "Docker installation via brew just finished. "
+                    "Requires user to finish docker install before tp-timesheet will work"
+                )
+            ) from exc
+
+        # Launch docker engine, does nothing if already running
+        docker_open = subprocess.run(
+            ["open", "--hide", "--background", "-a", "Docker"],
+            check=False,
+            capture_output=True,
+        )
+        if docker_open.returncode != 0:
+            # Something unexpected happened. Capture stderror
+            raise DockerHandlerException(docker_open.stderr.decode().strip())
+
+        # Check docker engine is running. Timeout after 20 seconds
+        for _ in range(10):
+            docker_stats = subprocess.run(
+                ["docker", "stats", "--no-stream"], check=False, capture_output=True
+            )
+            if docker_stats.returncode == 0:
+                return
+            logger.debug("Waiting for docker engine to spool up")
+            time.sleep(2)
+
+        # Docker engine timed out
+        raise DockerHandlerException(
+            "Docker engine is unresponsive. Please check your docker install"
+        )

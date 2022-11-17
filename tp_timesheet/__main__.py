@@ -7,7 +7,7 @@ import warnings
 import selenium
 import docker
 from workalendar.asia import Singapore
-from tp_timesheet.docker_handler import DockerHandler
+from tp_timesheet.docker_handler import DockerHandler, DockerHandlerException
 from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.date_utils import get_working_dates, get_start_date, assert_start_date
 from tp_timesheet.schedule import ScheduleForm
@@ -78,7 +78,10 @@ def run():
     docker_handler = None
 
     config = Config(verbose=args.verbose)
+
     try:
+        DockerHandler.install_and_launch_docker()
+
         # Automate Mode
         if args.automate is not None:
             valid_options = ["weekdays"]
@@ -158,6 +161,13 @@ def run():
     except selenium.common.exceptions.NoSuchElementException:
         notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
 was not found by Selenium"
+        logger.critical(notification_text, exc_info=True)
+        os.system(
+            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
+                    default button "OK" with icon 2'"""
+        )
+    except DockerHandlerException as error:
+        notification_text = f"⚠️ TP-timesheet was not submitted successfully. {error}"
         logger.critical(notification_text, exc_info=True)
         os.system(
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
