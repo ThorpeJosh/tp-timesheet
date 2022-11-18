@@ -4,23 +4,36 @@
 [![PyPI license](https://img.shields.io/pypi/l/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
 
 Automated submission of TP timesheets
-
-## Usage
+## Installation
+### Install
 This tool is published on pypi so from any terminal with python3 installed run:
 
-``` bash
+```bash
 pip install tp-timesheet
 ```
+**Note:** some outdated OS's still require pip3 instead of pip. If you get an error `Unknown command: pip` then try the following:
+```bash
+pip3 install tp-timesheet
+```
+### Upgrade
+```bash
+pip install --upgrade tp-timesheet
+```
+### Uninstall
+```bash
+pip uninstall tp-timesheet
+```
+## Usage
 
-Then run the tool with the help option to find out additional usage information
+Run the tool with the help option to find out additional usage information
 
-``` bash
+```bash
 tp-timesheet --help
 ```
 
 ### Common cli options
 
-``` bash
+```bash
 # submit today
 tp-timesheet --start today
 
@@ -48,7 +61,7 @@ tp-timesheet --help
 ### Contributing 
 To run checks prior to committing
 
-```
+```bash
 black --check --diff tp_timesheet # See what formatting changes need to be made
 black tp_timesheet # Run formatter
 pylint tp_timesheet # Run linter
