@@ -13,6 +13,7 @@ from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.date_utils import get_working_dates, get_start_date, assert_start_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
+from tp_timesheet.clockify import Clockify
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +85,7 @@ def run():
     notification_flag = False
 
     config = Config(verbose=args.verbose)
+    clockify = Clockify(api_key)
 
     try:
         DockerHandler.install_and_launch_docker()
@@ -141,6 +143,8 @@ def run():
                 dry_run=args.dry_run,
                 working_hours=hours,
             )
+
+            Clockify.submit_clockify(date, working_hours = hours, verbose = args.verbose, dry_run = args.dry_run)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":
