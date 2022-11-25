@@ -13,7 +13,7 @@ from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.date_utils import get_working_dates, get_start_date, assert_start_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
-from tp_timesheet.clockify import Clockify
+from tp_timesheet.clockify_timesheet import Clockify
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +85,7 @@ def run():
     notification_flag = False
 
     config = Config(verbose=args.verbose)
+    api_key = "placeholder_api_key"
     clockify = Clockify(api_key)
 
     try:
@@ -144,7 +145,9 @@ def run():
                 working_hours=hours,
             )
 
-            Clockify.submit_clockify(date, working_hours = hours, verbose = args.verbose, dry_run = args.dry_run)
+            clockify.submit_clockify(
+                date, working_hours=hours, verbose=args.verbose, dry_run=args.dry_run
+            )
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":
