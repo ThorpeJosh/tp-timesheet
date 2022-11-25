@@ -7,6 +7,7 @@ import warnings
 import selenium
 import docker
 from workalendar.asia import Singapore
+from tp_timesheet import __version__
 from tp_timesheet.docker_handler import DockerHandler, DockerHandlerException
 from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.date_utils import get_working_dates, get_start_date, assert_start_date
@@ -67,6 +68,9 @@ def parse_args():
         "--dry-run",
         action="store_true",
         help="Dry run mode, runs through as per normal but will not click submit",
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}"
     )
     return parser.parse_args()
 
