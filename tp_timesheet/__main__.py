@@ -81,8 +81,7 @@ def run():
     notification_flag = False
 
     config = Config(verbose=args.verbose)
-    api_key = "placeholder_api_key"
-    clockify = Clockify(api_key)
+    clockify = Clockify(config.CLOCKIFY_API_KEY)
 
     try:
         DockerHandler.install_and_launch_docker()
