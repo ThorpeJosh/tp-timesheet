@@ -6,7 +6,6 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
