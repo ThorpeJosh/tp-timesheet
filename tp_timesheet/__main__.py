@@ -81,10 +81,10 @@ def run():
     notification_flag = False
 
     config = Config(verbose=args.verbose)
-    clockify = Clockify(config.CLOCKIFY_API_KEY)
 
     try:
         DockerHandler.install_and_launch_docker()
+        clockify = Clockify(config.CLOCKIFY_API_KEY)
 
         # Automate Mode
         if args.automate is not None:
@@ -141,7 +141,7 @@ def run():
             )
 
             clockify.submit_clockify(
-                date, working_hours=hours, verbose=args.verbose, dry_run=args.dry_run
+                date, working_hours=hours, dry_run=args.dry_run
             )
 
         # Notification (OSX only)
