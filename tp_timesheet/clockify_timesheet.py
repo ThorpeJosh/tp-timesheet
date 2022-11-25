@@ -1,9 +1,6 @@
 """Module to submit clockify timesheet, retrieve workspace ID, project ID and task ID
 """
 
-import requests  # pylint: disable=unused-import
-
-
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
