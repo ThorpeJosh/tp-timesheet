@@ -25,7 +25,12 @@ class Config:
     # config parameters (need to be accessible to tests without invoking __init__)
     sanity_check_bool_dict = {"sanity_check_start_date": "True"}
     sanity_check_range_dict = {"sanity_check_range": "7"}
-    DEFAULT_CONF = {**sanity_check_bool_dict, **sanity_check_range_dict}
+    clockify_api_key = {"clockify_api_key": "change_me"}
+    DEFAULT_CONF = {
+        **sanity_check_bool_dict,
+        **sanity_check_range_dict,
+        **clockify_api_key,
+    }
 
     @classmethod
     def __init__(cls, verbose=False, config_filename="tp.conf"):
@@ -50,6 +55,9 @@ class Config:
         )
         cls.SANITY_CHECK_RANGE = config.get(
             "configuration", next(iter(cls.sanity_check_range_dict))
+        )
+        cls.CLOCKIFY_API_KEY = config.get(
+            "configuration", next(iter(cls.clockify_api_key))
         )
 
     @classmethod
@@ -126,9 +134,21 @@ class Config:
         input_config.read(cls.CONFIG_PATH)
 
         # Version compatibility (#20)
+        # Creates all config keys that don't exists yet and sets to default values
         for config_key, config_value in cls.DEFAULT_CONF.items():
             if not input_config.has_option("configuration", config_key):
                 input_config.set("configuration", config_key, config_value)
+
+        # Version compatability (#65)
+        # Will check to ensure API key has been changed from the default value
+        if (
+            input_config.get("configuration", next(iter(cls.clockify_api_key)))
+            == cls.clockify_api_key[next(iter(cls.clockify_api_key))]
+        ):
+            clockify_api = input("Enter clockify API key:")
+            input_config.set(
+                "configuration", next(iter(cls.clockify_api_key)), clockify_api
+            )
 
         with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
             input_config.write(config_file)
