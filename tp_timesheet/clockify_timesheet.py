@@ -1,10 +1,10 @@
 """Module to submit clockify timesheet, retrieve workspace ID, project ID and task ID
 """
+import json
 import logging
 import requests
 
 logger = logging.getLogger(__name__)
-
 
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
@@ -49,7 +49,9 @@ class Clockify:
 
     def get_workspace_id(self):
         """Send request to get workspace id"""
-        return
+        get_request = requests.get("https://api.clockify.me/api/v1/user", headers={"X-Api-Key":self.api_key}, timeout=2)
+        request_dict = json.loads(get_request.text)
+        self.workspace_id = request_dict["activeWorkspace"]
 
     def get_project_id(self):
         """Send request to get project id"""
