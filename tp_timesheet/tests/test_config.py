@@ -13,18 +13,22 @@ sys.path.insert(0, src_path)
 
 
 @pytest.fixture(name="tmp_config")
-def fixture_create_tmp_config():
+def fixture_create_tmp_config_with_api():
     """
     Creates a tmp config file prior to running a test that uses this fixture.
     It then cleans up the tmp file after the test has run
     """
     # Fake config loaded by pytest
     test_config_path = Config.CONFIG_DIR.joinpath("tmp_pytest.conf")
-    config_str = """
+    if os.getenv("CLOCKIFY_CRED"):
+        api_key = os.getenv("CLOCKIFY_CRED")
+    else:
+        api_key = Config.API
+    config_str = f"""
 [configuration]
 tp_email = fake@email.com
 tp_url = https://example.com/path
-clockify_api_key = 1234
+clockify_api_key = "{api_key}"
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)

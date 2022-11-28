@@ -50,6 +50,7 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
+        cls.API = config.get("configuration", "clockify_api_key")
         cls.SANITY_CHECK_START_DATE = config.get(
             "configuration", next(iter(cls.sanity_check_bool_dict))
         )
@@ -103,6 +104,13 @@ class Config:
         )
         return bool(regex.search(url))
 
+    @staticmethod
+    def is_valid_key(api_key):
+        """Check api key is valid"""
+        regex_api = bool(re.match("^[A-Za-z0-9]*$", api_key))
+        len_api = len(api_key) > 40
+        return regex_api & len_api
+
     @classmethod
     def _read_write_config(cls):
         """Function to read the config file or create one if it doesn't exist"""
@@ -146,6 +154,8 @@ class Config:
             == cls.clockify_api_key[next(iter(cls.clockify_api_key))]
         ):
             clockify_api = input("Enter clockify API key:")
+            while not cls.is_valid_key(clockify_api):
+                clockify_api = input("Invalid api key, please try again:")
             input_config.set(
                 "configuration", next(iter(cls.clockify_api_key)), clockify_api
             )
