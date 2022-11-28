@@ -6,6 +6,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
@@ -14,7 +15,7 @@ class Clockify:
     def __init__(self, api_key):
         self.api_key = api_key
 
-        self.workspace_id = None
+        self.workspace_id, self.user_id = self.get_workspace_user_id()
         self.project_id = None
         self.task_id = None
 
@@ -44,7 +45,7 @@ class Clockify:
         response.raise_for_status()
         logger.debug("POST:  %s\nResponse: %s", time_entry_json, response.text)
 
-    def get_workspace_id(self):
+    def get_workspace_user_id(self):
         """Send request to get workspace id"""
         get_request = requests.get(
             "https://api.clockify.me/api/v1/user",
@@ -52,7 +53,9 @@ class Clockify:
             timeout=2,
         )
         request_dict = json.loads(get_request.text)
-        self.workspace_id = request_dict["activeWorkspace"]
+        workspace_id = request_dict["activeWorkspace"]
+        user_id = request_dict["id"]
+        return workspace_id, user_id
 
     def get_project_id(self):
         """Send request to get project id"""
