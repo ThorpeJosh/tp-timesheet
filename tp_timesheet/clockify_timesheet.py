@@ -66,8 +66,27 @@ class Clockify:
 
     def get_project_id(self):
         """Send request to get project id"""
-        return
+        self.get_workspace_id()
+        get_request = requests.get(
+            f"https://api.clockify.me/api/v1/workspaces/{self.workspace_id}/projects",
+            headers={"X-Api-Key": self.api_key},
+            timeout=2,
+        )
+        request_list = json.loads(get_request.text)
+        for dic in request_list:
+            if dic["name"] == "Jupiter Staffing APAC":
+                self.project_id = dic["id"]
 
     def get_task_id(self):
         """Send request to get task id"""
-        return
+        self.get_workspace_id()
+        self.get_project_id()
+        get_request = requests.get(
+            f"https://api.clockify.me/api/v1/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks",
+            headers={"X-Api-Key": self.api_key},
+            timeout=2,
+        )
+        request_list = json.loads(get_request.text)
+        for dic in request_list:
+            if dic["name"] == "Live hours":
+                self.task_id = dic["id"]
