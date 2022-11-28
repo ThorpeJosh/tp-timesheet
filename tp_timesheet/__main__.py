@@ -144,9 +144,7 @@ def run():
                 working_hours=hours,
             )
 
-            clockify.submit_clockify(
-                date, working_hours=hours, dry_run=args.dry_run
-            )
+            clockify.submit_clockify(date, working_hours=hours, dry_run=args.dry_run)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":

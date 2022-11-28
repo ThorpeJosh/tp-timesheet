@@ -6,6 +6,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
@@ -43,13 +44,18 @@ class Clockify:
         )
         if response.status_code != 200 and not dry_run:
             raise ValueError(
-                f"Clockify submission failed with status code: {response.status_code}\n Response: {response.text}"
+                f"Clockify submission failed with status code: {response.status_code}\n"
+                f"POST: {time_entry_json}\nResponse: {response.text}"
             )
-        logger.debug(f"POST: {time_entry_json}\nResponse:{response:text}")
+        logger.debug("POST:  %s\nResponse: %s", time_entry_json, response.text)
 
     def get_workspace_id(self):
         """Send request to get workspace id"""
-        get_request = requests.get("https://api.clockify.me/api/v1/user", headers={"X-Api-Key":self.api_key}, timeout=2)
+        get_request = requests.get(
+            "https://api.clockify.me/api/v1/user",
+            headers={"X-Api-Key": self.api_key},
+            timeout=2,
+        )
         request_dict = json.loads(get_request.text)
         self.workspace_id = request_dict["activeWorkspace"]
 
