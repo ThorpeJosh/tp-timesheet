@@ -66,7 +66,8 @@ class Clockify:
 
     def get_project_id(self):
         """Send request to get project id"""
-        self.get_workspace_id()
+        if not self.workspace_id:
+            self.get_workspace_id()
         get_request = requests.get(
             f"https://api.clockify.me/api/v1/workspaces/{self.workspace_id}/projects",
             headers={"X-Api-Key": self.api_key},
@@ -79,8 +80,10 @@ class Clockify:
 
     def get_task_id(self):
         """Send request to get task id"""
-        self.get_workspace_id()
-        self.get_project_id()
+        if not self.workspace_id:
+            self.get_workspace_id()
+        if not self.project_id:
+            self.get_project_id()
         get_request = requests.get(
             f"https://api.clockify.me/api/v1/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks",
             headers={"X-Api-Key": self.api_key},
