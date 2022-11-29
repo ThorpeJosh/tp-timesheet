@@ -16,8 +16,8 @@ class Clockify:
         self.api_key = api_key
 
         self.workspace_id, self.user_id = self._get_workspace_user_id()
-        self.project_id = None
-        self.task_id = None
+        self.project_id = self._get_project_id()
+        self.task_id = self._get_task_id()
 
     def submit_clockify(self, date, working_hours, dry_run=False):
         """Submit entry to clockify"""
@@ -64,32 +64,46 @@ class Clockify:
         user_id = request_dict["id"]
         return workspace_id, user_id
 
-    def get_project_id(self):
+    def _get_project_id(self):
         """Send request to get project id"""
-        if not self.workspace_id:
-            self.get_workspace_id()
         get_request = requests.get(
-            f"https://api.clockify.me/api/v1/workspaces/{self.workspace_id}/projects",
+            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects",
             headers={"X-Api-Key": self.api_key},
             timeout=2,
         )
+        if get_request.status_code != "200":
+            logger.error(
+                "Get project ID error, return code %s, check your API key",
+                get_request.status_code,
+            )
+            return None
         request_list = json.loads(get_request.text)
         for dic in request_list:
             if dic["name"] == "Jupiter Staffing APAC":
-                self.project_id = dic["id"]
+                return dic["id"]
+        logger.error(
+            'Could not find project named "Jupiter Staffing APAC", check your API key'
+        )
+        return None
 
-    def get_task_id(self):
+    def _get_task_id(self):
         """Send request to get task id"""
-        if not self.workspace_id:
-            self.get_workspace_id()
-        if not self.project_id:
-            self.get_project_id()
         get_request = requests.get(
-            f"https://api.clockify.me/api/v1/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks",
+            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks",
             headers={"X-Api-Key": self.api_key},
             timeout=2,
         )
+        if get_request.status_code != "200":
+            logger.error(
+                "Get project ID error, return code %s, check your API key",
+                get_request.status_code,
+            )
+            return None
         request_list = json.loads(get_request.text)
         for dic in request_list:
             if dic["name"] == "Live hours":
-                self.task_id = dic["id"]
+                return dic["id"]
+        logger.error(
+                'Could not find task named "Live hours", check your API key'
+        )
+        return None
