@@ -55,12 +55,11 @@ class Clockify:
     def _get_workspace_user_id(self):
         """Send request to get workspace id"""
         get_request = requests.get(
-            self.api_base_endpoint,
+            f"{self.api_base_endpoint}/user",
             headers={"X-Api-Key": self.api_key},
             timeout=2,
         )
         get_request.raise_for_status()
-        logger.debug("Response: %s", get_request.text)
         request_dict = json.loads(get_request.text)
         workspace_id = request_dict["activeWorkspace"]
         user_id = request_dict["id"]
