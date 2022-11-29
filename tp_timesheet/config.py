@@ -25,7 +25,9 @@ class Config:
     # config parameters (need to be accessible to tests without invoking __init__)
     sanity_check_bool_dict = {"sanity_check_start_date": "True"}
     sanity_check_range_dict = {"sanity_check_range": "7"}
-    clockify_api_key = {"clockify_api_key": "change_me"}
+    clockify_api_key = {
+        "clockify_api_key": "AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234"
+    }
     DEFAULT_CONF = {
         **sanity_check_bool_dict,
         **sanity_check_range_dict,

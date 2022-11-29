@@ -9,7 +9,7 @@ from tp_timesheet.config import Config
 
 # Import config fixture from adjacent test
 # pylint: disable=(unused-import)
-from .test_config import fixture_create_tmp_config_with_api
+from .test_config import fixture_create_tmp_mock_config
 
 tests_path = os.path.dirname(os.path.abspath(__file__))
 src_path = tests_path + "/../"
