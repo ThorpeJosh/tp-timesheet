@@ -80,7 +80,9 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
         )
         tool_issues.send_keys("0")
 
-        if not dry_run:
+        if dry_run:
+            logger.debug("This is a DRY-RUN, submit button is not clicked")
+        else:
             # find submit button and click submit
             submit = browser.find_element(
                 By.XPATH,

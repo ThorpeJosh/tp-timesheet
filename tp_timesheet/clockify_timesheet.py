@@ -33,17 +33,22 @@ class Clockify:
             "taskId": self.task_id,
         }
 
-        # Use fake api_key if in dry_mode
-        api_key = "1234" if dry_run else self.api_key
-
-        response = requests.post(
-            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/time-entries",
-            headers={"X-Api-Key": api_key},
-            json=time_entry_json,
-            timeout=2,
+        if dry_run:
+            logger.debug("This is a DRY-RUN, api POST is not being sent")
+        else:
+            response = requests.post(
+                f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/time-entries",
+                headers={"X-Api-Key": self.api_key},
+                json=time_entry_json,
+                timeout=2,
+            )
+            response.raise_for_status()
+        logger.debug(
+            "Dry-run: %s POST:  %s\nResponse: %s",
+            dry_run,
+            time_entry_json,
+            response.text,
         )
-        response.raise_for_status()
-        logger.debug("POST:  %s\nResponse: %s", time_entry_json, response.text)
 
     def get_workspace_user_id(self):
         """Send request to get workspace id"""
