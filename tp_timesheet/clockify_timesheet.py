@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
+    # pylint: disable=too-few-public-methods
+
     api_base_endpoint = "https://api.clockify.me/api/v1"
 
     def __init__(self, api_key):
@@ -103,7 +105,5 @@ class Clockify:
         for dic in request_list:
             if dic["name"] == "Live hours":
                 return dic["id"]
-        logger.error(
-                'Could not find task named "Live hours", check your API key'
-        )
+        logger.error('Could not find task named "Live hours", check your API key')
         return None
