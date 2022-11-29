@@ -73,20 +73,14 @@ class Clockify:
             headers={"X-Api-Key": self.api_key},
             timeout=2,
         )
-        if get_request.status_code != "200":
-            logger.error(
-                "Get project ID error, return code %s, check your API key",
-                get_request.status_code,
-            )
-            return None
+        get_request.raise_for_status()
         request_list = json.loads(get_request.text)
         for dic in request_list:
             if dic["name"] == "Jupiter Staffing APAC":
                 return dic["id"]
-        logger.error(
+        raise ValueError(
             'Could not find project named "Jupiter Staffing APAC", check your API key'
         )
-        return None
 
     def _get_task_id(self):
         """Send request to get task id"""
@@ -95,15 +89,9 @@ class Clockify:
             headers={"X-Api-Key": self.api_key},
             timeout=2,
         )
-        if get_request.status_code != "200":
-            logger.error(
-                "Get project ID error, return code %s, check your API key",
-                get_request.status_code,
-            )
-            return None
+        get_request.raise_for_status()
         request_list = json.loads(get_request.text)
         for dic in request_list:
             if dic["name"] == "Live hours":
                 return dic["id"]
-        logger.error('Could not find task named "Live hours", check your API key')
-        return None
+        raise ValueError('Could not find task named "Live hours", check your API key')
