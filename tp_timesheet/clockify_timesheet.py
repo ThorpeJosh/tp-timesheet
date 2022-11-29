@@ -42,11 +42,7 @@ class Clockify:
             json=time_entry_json,
             timeout=2,
         )
-        if response.status_code != 200 and not dry_run:
-            raise ValueError(
-                f"Clockify submission failed with status code: {response.status_code}\n"
-                f"POST: {time_entry_json}\nResponse: {response.text}"
-            )
+        response.raise_for_status()
         logger.debug("POST:  %s\nResponse: %s", time_entry_json, response.text)
 
     def get_workspace_id(self):
