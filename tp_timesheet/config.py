@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Config:
-    """Config class, manages the initialization of all the necesarry globals."""
+    """Config class, manages the initialization of all the necessary globals."""
 
     # pylint:disable = anomalous-backslash-in-string
     ROOT_LOGGER = None
@@ -52,7 +52,6 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
-        cls.API = config.get("configuration", "clockify_api_key")
         cls.SANITY_CHECK_START_DATE = config.get(
             "configuration", next(iter(cls.sanity_check_bool_dict))
         )

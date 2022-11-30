@@ -43,15 +43,17 @@ def fixture_create_tmp_clockify_api_config():
     if os.getenv("CLOCKIFY_CRED"):
         api_key = os.getenv("CLOCKIFY_CRED")
     else:
-        api_key = Config.API
+        config = Config()
+        api_key = config.CLOCKIFY_API_KEY
     config_str = f"""
 [configuration]
 tp_email = fake@email.com
 tp_url = https://example.com/path
-clockify_api_key = "{api_key}"
+clockify_api_key = {api_key}
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)
+    print(config_str)
     yield test_config_path
     os.remove(test_config_path)
 
