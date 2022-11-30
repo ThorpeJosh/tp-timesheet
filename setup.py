@@ -37,7 +37,7 @@ setup(
     include_package_data=True,
     install_requires=REQUIREMENTS,
     extras_require=DEV_REQUIREMENTS,
-    python_requires=">=3.6",
+    python_requires=">=3.8",
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
