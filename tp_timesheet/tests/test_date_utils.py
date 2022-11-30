@@ -116,11 +116,11 @@ def test_various_date_formats():
             ), f"parsing error, query:{query_str} and parsed:{parsed}"
 
 
-def test_assert_start_date(tmp_config):
+def test_assert_start_date(mock_config):
     """
     test the assert function of start date
     """
-    Config(config_filename=tmp_config)
+    Config(config_filename=mock_config)
 
     date_range = int(Config.SANITY_CHECK_RANGE)
     today = datetime.today().date()
