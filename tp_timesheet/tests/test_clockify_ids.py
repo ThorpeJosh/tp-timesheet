@@ -1,4 +1,5 @@
 """Unit tests for the retrieving of ids"""
+import datetime
 from tp_timesheet.clockify_timesheet import Clockify
 from tp_timesheet.config import Config
 
@@ -36,3 +37,51 @@ def test_ids(clockify_config):
         assert (
             clockify_val.task_id in TASK_IDS
         ), f"Task ID Error, expected value from: {TASK_IDS}, result:{clockify_val.task_id}"
+
+
+def test_remove_existing_entries(clockify_config):
+    """Test removal of clockify time entries.
+
+    Test coverage:
+      *  Tests that the existing time entries can be retreived for a particular day,
+      *  Tests that the entries for a particular day can all be cleared
+      *  Tests that max of one entry exists per day
+    """
+
+    def assert_number_of_entries(test_date, number_of_entries):
+        actual_number_of_entries = len(clockify.get_time_entry_id(test_date))
+        assert actual_number_of_entries == number_of_entries, (
+            f"Incorrect number of entries, expected: {number_of_entries},"
+            f"returned: {actual_number_of_entries}"
+        )
+
+    # Instantiate a Clockify object
+    config = Config(config_filename=clockify_config)
+    clockify = Clockify(api_key=config.CLOCKIFY_API_KEY, task="training")
+
+    # Use following date as test date. Sunday Jan 1st
+    test_date = datetime.date(2023, 1, 1)
+
+    # Remove all entries incase any are left over from previous tests
+    clockify.delete_time_entry(test_date)
+
+    # Check no entry exists
+    assert_number_of_entries(test_date, 0)
+
+    # Add a clockify entry with 1 hour
+    clockify.submit_clockify(test_date, 1)
+
+    # Check only one entry exists
+    assert_number_of_entries(test_date, 1)
+
+    # Resubmit clockify entry with 4 hours
+    clockify.submit_clockify(test_date, 4)
+
+    # Check only one entry exists still
+    assert_number_of_entries(test_date, 1)
+
+    # Remove all entries
+    clockify.delete_time_entry(test_date)
+
+    # Check no entry exists
+    assert_number_of_entries(test_date, 0)

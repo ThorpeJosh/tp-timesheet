@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
-    # pylint: disable=too-few-public-methods
     task_project_dict = {
         "live": ("Live hours", "Jupiter Staffing APAC"),
         "training": ("Training", "Jupiter Staffing APAC"),
@@ -36,7 +35,17 @@ class Clockify:
 
     def submit_clockify(self, date, working_hours, dry_run=False):
         """Submit entry to clockify"""
-        # Retrieve project and task ids based on what the user specifies
+
+        if not dry_run:
+            # delete time entry if exist
+            self.delete_time_entry(date)
+
+        # post entry
+        self._post_time_entry(date, working_hours, dry_run)
+
+    def _post_time_entry(self, date, working_hours, dry_run):
+        """Post a time entry to clockify"""
+
         # Timestamps via API need to be UTC
         # Create a timezone aware datetime object
         tz_file = dateutil.tz.gettz(self.timezone)
@@ -72,6 +81,55 @@ class Clockify:
                 "POST:  %s\nResponse: %s",
                 time_entry_json,
                 response.text,
+            )
+            response.raise_for_status()
+
+    def get_time_entry_id(self, date):
+        """Get a time entry from clockify on a certain date"""
+
+        # Timestamps via API need to be UTC
+        # Create a timezone aware datetime object
+        tz_file = dateutil.tz.gettz(self.timezone)
+        start_dt = datetime.datetime.combine(
+            date, datetime.time(0, 0, 0), tzinfo=tz_file
+        )
+        end_dt = datetime.datetime.combine(
+            date, datetime.time(23, 59, 59), tzinfo=tz_file
+        )
+        # Generate ISO (POSIX datetime) strings in UTC format
+        start_timestamp = start_dt.astimezone(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+        end_timestamp = end_dt.astimezone(datetime.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+
+        params = {"start": start_timestamp, "end": end_timestamp}
+
+        response = requests.get(
+            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/user/{self.user_id}/time-entries",
+            headers={"X-Api-Key": self.api_key},
+            params=params,
+            timeout=2,
+        )
+        response.raise_for_status()
+        response_list = json.loads(response.text)
+
+        # Extract time entries
+        time_entry_ids = []
+        if response_list:
+            for entry in response_list:
+                time_entry_ids.append(entry["id"])
+        return time_entry_ids
+
+    def delete_time_entry(self, date):
+        """Delete a time entry from clockify"""
+        time_entry_ids = self.get_time_entry_id(date)
+        for entry in time_entry_ids:
+            response = requests.delete(
+                f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/time-entries/{entry}",
+                headers={"X-Api-Key": self.api_key},
+                timeout=2,
             )
             response.raise_for_status()
 
@@ -132,5 +190,3 @@ class Clockify:
             if dic["name"] == task:
                 return dic["id"]
         raise ValueError(f'Could not find task named "{task}", check your API key')
-
-    # def _get_tag_id(self):
