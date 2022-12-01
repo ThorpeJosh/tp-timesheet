@@ -16,7 +16,7 @@ class Clockify:
 
     api_base_endpoint = "https://api.clockify.me/api/v1"
 
-    def __init__(self, api_key):
+    def __init__(self, api_key, project, task):
         self.api_key = api_key
 
         (
@@ -25,11 +25,12 @@ class Clockify:
             self.timezone,
             self.start_time,
         ) = self._get_workspace_user_id()
-        self.project_id = self._get_project_id()
-        self.task_id = self._get_task_id()
+        self.project_id = self._get_project_id(project)
+        self.task_id = self._get_task_id(task)
 
     def submit_clockify(self, date, working_hours, dry_run=False):
         """Submit entry to clockify"""
+        # Retrieve project and task ids based on what the user specifies
         # Timestamps via API need to be UTC
         # Create a timezone aware datetime object
         tz_file = dateutil.tz.gettz(self.timezone)
@@ -94,7 +95,7 @@ class Clockify:
         start_time = datetime.datetime.strptime(start_time_str, "%H:%M").time()
         return workspace_id, user_id, timezone, start_time
 
-    def _get_project_id(self):
+    def _get_project_id(self, project):
         """Send request to get project id"""
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects",
@@ -104,13 +105,13 @@ class Clockify:
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
         for dic in request_list:
-            if dic["name"] == "Jupiter Staffing APAC":
+            if dic["name"] == project:
                 return dic["id"]
         raise ValueError(
-            'Could not find project named "Jupiter Staffing APAC", check your API key'
+            f'Could not find project named "{project}", check your API key'
         )
 
-    def _get_task_id(self):
+    def _get_task_id(self, task):
         """Send request to get task id"""
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks",
@@ -120,6 +121,8 @@ class Clockify:
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
         for dic in request_list:
-            if dic["name"] == "Live hours":
+            if dic["name"] == task:
                 return dic["id"]
-        raise ValueError('Could not find task named "Live hours", check your API key')
+        raise ValueError(f'Could not find task named "{task}", check your API key')
+
+    # def _get_tag_id(self):
