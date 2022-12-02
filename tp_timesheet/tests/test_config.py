@@ -53,7 +53,6 @@ clockify_api_key = {api_key}
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)
-    print(config_str)
     yield test_config_path
     os.remove(test_config_path)
 
