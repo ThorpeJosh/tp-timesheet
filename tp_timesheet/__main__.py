@@ -73,6 +73,13 @@ def parse_args():
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
+    parser.add_argument(
+        "--task",
+        type=str,
+        default="live",
+        help="The type of task for the clockify submission. Specify task name "
+        + "if it anything other than 'live'. Put the task name (training, OOO, holiday) in small letters",
+    )
     return parser.parse_args()
 
 
@@ -88,7 +95,7 @@ def run():
 
     try:
         DockerHandler.install_and_launch_docker()
-        clockify = Clockify(config.CLOCKIFY_API_KEY)
+        clockify = Clockify(config.CLOCKIFY_API_KEY, task=args.task)
 
         # Automate Mode
         if args.automate is not None:
