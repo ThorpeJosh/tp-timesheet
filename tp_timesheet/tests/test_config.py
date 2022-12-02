@@ -50,6 +50,7 @@ def fixture_create_tmp_clockify_api_config():
 tp_email = fake@email.com
 tp_url = https://example.com/path
 clockify_api_key = {api_key}
+locale = en_SG
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)

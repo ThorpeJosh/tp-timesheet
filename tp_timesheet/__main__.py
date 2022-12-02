@@ -95,7 +95,9 @@ def run():
 
     try:
         DockerHandler.install_and_launch_docker()
-        clockify = Clockify(config.CLOCKIFY_API_KEY, task=args.task)
+        clockify = Clockify(
+            config.CLOCKIFY_API_KEY, task=args.task, locale=config.LOCALE
+        )
 
         # Automate Mode
         if args.automate is not None:

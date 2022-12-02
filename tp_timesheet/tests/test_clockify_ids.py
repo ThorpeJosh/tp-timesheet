@@ -28,7 +28,9 @@ def test_ids(clockify_config):
     config = Config(config_filename=clockify_config)
     tasks = ["live", "training", "OOO", "holiday"]
     for selected_t in tasks:
-        clockify_val = Clockify(api_key=config.CLOCKIFY_API_KEY, task=selected_t)
+        clockify_val = Clockify(
+            api_key=config.CLOCKIFY_API_KEY, task=selected_t, locale="en_SG"
+        )
         assert (
             clockify_val.workspace_id == WORKSPACE_ID
         ), f"Workspace ID Error, expected: {WORKSPACE_ID}, result:{clockify_val.workspace_id}"

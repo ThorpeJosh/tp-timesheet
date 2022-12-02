@@ -37,7 +37,7 @@ class Config:
     @classmethod
     def __init__(cls, verbose=False, config_filename="tp.conf"):
         """This is the entry point for the class and running this will setup the tp-timesheet
-        config and make all the necesarry globals available
+        config and make all the necessary globals available
         """
         cls.VERBOSE = verbose
         cls.CONFIG_DIR = Config.CONFIG_DIR
@@ -52,6 +52,7 @@ class Config:
         # Load global configurations
         cls.EMAIL = config.get("configuration", "tp_email")
         cls.URL = config.get("configuration", "tp_url")
+        cls.LOCALE = config.get("configuration", "locale_tag")
         cls.SANITY_CHECK_START_DATE = config.get(
             "configuration", next(iter(cls.sanity_check_bool_dict))
         )
@@ -112,6 +113,12 @@ class Config:
         len_api = len(api_key) > 40
         return regex_api & len_api
 
+    @staticmethod
+    def is_valid_locale(locale):
+        """Check locale is valid"""
+        regex = re.match("^[a-z]{2}_[A-Z]{2}$", locale)
+        return bool(regex)
+
     @classmethod
     def _read_write_config(cls):
         """Function to read the config file or create one if it doesn't exist"""
@@ -128,9 +135,13 @@ class Config:
             url = input("Enter timesheet url:")
             while not cls.is_valid_url(url):
                 url = input("Invalid url, please try again:")
+            locale = input("Enter locale:")
+            while not cls.is_valid_locale(locale):
+                locale = input("Invalid locale, please try again:")
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
+                "locale_tag": locale,
             }
             config["configuration"].update(cls.DEFAULT_CONF)
 
