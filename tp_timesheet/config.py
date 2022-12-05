@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Config:
-    """Config class, manages the initialization of all the necesarry globals."""
+    """Config class, manages the initialization of all the necessary globals."""
 
     # pylint:disable = anomalous-backslash-in-string
     ROOT_LOGGER = None
@@ -25,7 +25,9 @@ class Config:
     # config parameters (need to be accessible to tests without invoking __init__)
     sanity_check_bool_dict = {"sanity_check_start_date": "True"}
     sanity_check_range_dict = {"sanity_check_range": "7"}
-    clockify_api_key = {"clockify_api_key": "change_me"}
+    clockify_api_key = {
+        "clockify_api_key": "AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234"
+    }
     DEFAULT_CONF = {
         **sanity_check_bool_dict,
         **sanity_check_range_dict,
@@ -103,6 +105,13 @@ class Config:
         )
         return bool(regex.search(url))
 
+    @staticmethod
+    def is_valid_key(api_key):
+        """Check api key is valid"""
+        regex_api = bool(re.match("^[A-Za-z0-9]*$", api_key))
+        len_api = len(api_key) > 40
+        return regex_api & len_api
+
     @classmethod
     def _read_write_config(cls):
         """Function to read the config file or create one if it doesn't exist"""
@@ -147,6 +156,8 @@ class Config:
             == cls.clockify_api_key[next(iter(cls.clockify_api_key))]
         ):
             clockify_api = input("Enter clockify API key:")
+            while not cls.is_valid_key(clockify_api):
+                clockify_api = input("Invalid api key, please try again:")
             input_config.set(
                 "configuration", next(iter(cls.clockify_api_key)), clockify_api
             )

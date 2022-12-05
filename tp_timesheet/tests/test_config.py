@@ -12,10 +12,10 @@ src_path = tests_path + "/../"
 sys.path.insert(0, src_path)
 
 
-@pytest.fixture(name="tmp_config")
-def fixture_create_tmp_config():
+@pytest.fixture(name="mock_config")
+def fixture_create_tmp_mock_config():
     """
-    Creates a tmp config file prior to running a test that uses this fixture.
+    Creates a tmp config file with arbitrary values prior to running a test that uses this fixture.
     It then cleans up the tmp file after the test has run
     """
     # Fake config loaded by pytest
@@ -24,7 +24,32 @@ def fixture_create_tmp_config():
 [configuration]
 tp_email = fake@email.com
 tp_url = https://example.com/path
-clockify_api_key = 1234
+clockify_api_key = some_random_api
+    """
+    with open(test_config_path, "w", encoding="utf8") as conf_file:
+        conf_file.write(config_str)
+    yield test_config_path
+    os.remove(test_config_path)
+
+
+@pytest.fixture(name="clockify_config")
+def fixture_create_tmp_clockify_api_config():
+    """
+    Creates a tmp config file containing the clockify api prior to running a test that uses this fixture.
+    It then cleans up the tmp file after the test has run
+    """
+    # Fake config loaded by pytest
+    test_config_path = Config.CONFIG_DIR.joinpath("tmp_pytest.conf")
+    if os.getenv("CLOCKIFY_CRED"):
+        api_key = os.getenv("CLOCKIFY_CRED")
+    else:
+        config = Config()
+        api_key = config.CLOCKIFY_API_KEY
+    config_str = f"""
+[configuration]
+tp_email = fake@email.com
+tp_url = https://example.com/path
+clockify_api_key = {api_key}
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)
