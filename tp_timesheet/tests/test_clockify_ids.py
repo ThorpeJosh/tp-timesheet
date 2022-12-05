@@ -61,7 +61,9 @@ def test_remove_existing_entries(clockify_config):
 
     # Instantiate a Clockify object
     config = Config(config_filename=clockify_config)
-    clockify = Clockify(api_key=config.CLOCKIFY_API_KEY, task="training")
+    clockify = Clockify(
+        api_key=config.CLOCKIFY_API_KEY, task="training", locale=config.LOCALE
+    )
 
     # Use following date as test date. Random future date in January
     test_date = datetime.date(
