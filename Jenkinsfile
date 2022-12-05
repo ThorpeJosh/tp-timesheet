@@ -64,6 +64,9 @@ pipeline {
                         options {
                             timeout(time: 1, unit: 'MINUTES')
                         }
+                        environment {
+                            CLOCKIFY_CRED = credentials('ClockifyCredentials')
+                        }
                         steps {
                             echo "Environment: ${DOCKER_IMAGE}:${DOCKER_TAG}"
                             sh '''
