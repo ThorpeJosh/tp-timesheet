@@ -7,6 +7,7 @@ import os
 import re
 import configparser
 from pathlib import Path
+from tp_timesheet.clockify_timesheet import Clockify
 
 logger = logging.getLogger(__name__)
 
@@ -175,8 +176,9 @@ class Config:
             == cls.locale_tag[next(iter(cls.locale_tag))]
         ):
             locale_tag = input("Enter locale tag:")
+            poss_locales = list(Clockify.tag_dict.keys())
             while not cls.is_valid_locale(locale_tag):
-                locale_tag = input("Invalid locale, please try again:")
+                locale_tag = input(f"Please choose from {poss_locales}, try again:")
             input_config.set("configuration", next(iter(cls.locale_tag)), locale_tag)
 
         with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
