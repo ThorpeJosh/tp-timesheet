@@ -131,7 +131,8 @@ class Config:
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
-            }.update(cls.DEFAULT_CONF)
+            }
+            config["configuration"].update(cls.DEFAULT_CONF)
 
             with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
                 config.write(config_file)
