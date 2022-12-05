@@ -1,4 +1,5 @@
 """Unit tests for the retrieving of ids"""
+import random
 import datetime
 from tp_timesheet.clockify_timesheet import Clockify
 from tp_timesheet.config import Config
@@ -52,15 +53,18 @@ def test_remove_existing_entries(clockify_config):
         actual_number_of_entries = len(clockify.get_time_entry_id(test_date))
         assert actual_number_of_entries == number_of_entries, (
             f"Incorrect number of entries, expected: {number_of_entries},"
-            f"returned: {actual_number_of_entries}"
+            f"returned: {actual_number_of_entries}\n"
+            f"TESTING DATE: {test_date}"
         )
 
     # Instantiate a Clockify object
     config = Config(config_filename=clockify_config)
     clockify = Clockify(api_key=config.CLOCKIFY_API_KEY, task="training")
 
-    # Use following date as test date. Sunday Jan 1st
-    test_date = datetime.date(2023, 1, 1)
+    # Use following date as test date. Random future date in January
+    test_date = datetime.date(
+        2022 + random.randrange(1, 10, 1), 1, 1 + random.randrange(0, 30, 1)
+    )
 
     # Remove all entries incase any are left over from previous tests
     clockify.delete_time_entry(test_date)
