@@ -78,7 +78,7 @@ def parse_args():
         type=str,
         default="live",
         help="The type of task for the clockify submission. Specify task name "
-        + "if it anything other than 'live'. Put the task name (training, OOO, holiday) in small letters",
+        + "if it is anything other than 'live'. Put the task name (training, OOO, holiday) in small letters",
     )
     return parser.parse_args()
 

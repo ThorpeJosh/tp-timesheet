@@ -28,10 +28,12 @@ class Config:
     clockify_api_key = {
         "clockify_api_key": "AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234"
     }
+    locale_tag = {"locale_tag": "xx_XX"}
     DEFAULT_CONF = {
         **sanity_check_bool_dict,
         **sanity_check_range_dict,
         **clockify_api_key,
+        **locale_tag,
     }
 
     @classmethod
@@ -135,13 +137,9 @@ class Config:
             url = input("Enter timesheet url:")
             while not cls.is_valid_url(url):
                 url = input("Invalid url, please try again:")
-            locale = input("Enter locale:")
-            while not cls.is_valid_locale(locale):
-                locale = input("Invalid locale, please try again:")
             config["configuration"] = {
                 "tp_email": email,
                 "tp_url": url,
-                "locale_tag": locale,
             }
             config["configuration"].update(cls.DEFAULT_CONF)
 
@@ -172,6 +170,14 @@ class Config:
             input_config.set(
                 "configuration", next(iter(cls.clockify_api_key)), clockify_api
             )
+        if (
+            input_config.get("configuration", next(iter(cls.locale_tag)))
+            == cls.locale_tag[next(iter(cls.locale_tag))]
+        ):
+            locale_tag = input("Enter locale tag:")
+            while not cls.is_valid_locale(locale_tag):
+                locale_tag = input("Invalid locale, please try again:")
+            input_config.set("configuration", next(iter(cls.locale_tag)), locale_tag)
 
         with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
             input_config.write(config_file)

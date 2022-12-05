@@ -25,6 +25,7 @@ def fixture_create_tmp_mock_config():
 tp_email = fake@email.com
 tp_url = https://example.com/path
 clockify_api_key = some_random_api
+locale_tag = ab_CD
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)
@@ -50,7 +51,7 @@ def fixture_create_tmp_clockify_api_config():
 tp_email = fake@email.com
 tp_url = https://example.com/path
 clockify_api_key = {api_key}
-locale = en_SG
+locale_tag = en_SG
     """
     with open(test_config_path, "w", encoding="utf8") as conf_file:
         conf_file.write(config_str)
@@ -108,9 +109,13 @@ def test_config_upgrade_process(tmp_v3_config):
     assert list(config_dict["configuration"]) == ["tp_email", "tp_url"]
 
     # Initialize config which performs the upgrade
-    with mock.patch.object(
-        builtins, "input", lambda _: new_parameters["clockify_api_key"]
-    ):
+    # Create an iterable side_effect such that mock_inputs returns the next value each time it is called
+    mock_inputs = mock.Mock()
+    mock_inputs.side_effect = [
+        new_parameters["clockify_api_key"],
+        new_parameters["locale_tag"],
+    ]
+    with mock.patch.object(builtins, "input", lambda _: mock_inputs()):
         Config(config_filename=tmp_v3_config)
 
     # Test config file reads correctly and contains all the new parameters
