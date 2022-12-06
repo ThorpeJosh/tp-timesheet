@@ -7,7 +7,6 @@ import os
 import re
 import configparser
 from pathlib import Path
-from tp_timesheet.clockify_timesheet import Clockify
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,8 @@ class Config:
     clockify_api_key = {
         "clockify_api_key": "AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234"
     }
-    locale_tag = {"locale_tag": "xx_XX"}
+    locale_list = ["en_AU", "en_SG", "ko_KR", "ms_MY", "th_TH"]
+    locale_tag = {"locale_tag": "en_AU"}
     DEFAULT_CONF = {
         **sanity_check_bool_dict,
         **sanity_check_range_dict,
@@ -116,11 +116,12 @@ class Config:
         len_api = len(api_key) > 40
         return regex_api & len_api
 
-    @staticmethod
-    def is_valid_locale(locale):
+    # pylint:disable = too-many-function-args
+    @classmethod
+    def is_valid_locale(cls, locale):
         """Check locale is valid"""
-        regex = re.match("^[a-z]{2}_[A-Z]{2}$", locale)
-        return bool(regex)
+        valid = locale in cls.locale_list
+        return valid
 
     @classmethod
     def _read_write_config(cls):
@@ -175,8 +176,8 @@ class Config:
             input_config.get("configuration", next(iter(cls.locale_tag)))
             == cls.locale_tag[next(iter(cls.locale_tag))]
         ):
-            locale_tag = input("Enter locale tag:")
-            poss_locales = list(Clockify.tag_dict.keys())
+            poss_locales = cls.locale_list
+            locale_tag = input(f"Enter locale tag ({poss_locales}):")
             while not cls.is_valid_locale(locale_tag):
                 locale_tag = input(f"Please choose from {poss_locales}, try again:")
             input_config.set("configuration", next(iter(cls.locale_tag)), locale_tag)

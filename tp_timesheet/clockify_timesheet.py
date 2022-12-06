@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
-    # pylint: disable=too-many-instance-attributes
     task_project_dict = {
         "live": ("Live hours", "Jupiter Staffing APAC"),
         "training": ("Training", "Jupiter Staffing APAC"),
@@ -21,13 +20,6 @@ class Clockify:
     }
 
     api_base_endpoint = "https://api.clockify.me/api/v1"
-    tag_dict = {
-        "en_AU": "63519fce3da4c53079d15ebc",
-        "en_SG": "63519fde28051215c2de5647",
-        "ko_KR": "63519ff23da4c53079d1609c",
-        "ms_MY": "6280f9aaa54b17079938f87b",
-        "th_TH": "6280f9c9a54b17079938f8cf",
-    }
 
     def __init__(self, api_key, task, locale):
         self.api_key = api_key
@@ -40,7 +32,7 @@ class Clockify:
         ) = self._get_workspace_user_id()
         self.project_id = self._get_project_id(task)
         self.task_id = self._get_task_id(task)
-        self.locale_id = self.tag_dict[locale]
+        self.locale_id = self._get_locale_id(locale)
 
     def submit_clockify(self, date, working_hours, dry_run=False):
         """Submit entry to clockify"""
@@ -200,3 +192,16 @@ class Clockify:
             if dic["name"] == task:
                 return dic["id"]
         raise ValueError(f'Could not find task named "{task}", check your API key')
+
+    def _get_locale_id(self, locale):
+        get_request = requests.get(
+            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/tags",
+            headers={"X-Api-Key": self.api_key},
+            timeout=2,
+        )
+        get_request.raise_for_status()
+        request_list = json.loads(get_request.text)
+        for dic in request_list:
+            if dic["name"] == locale:
+                return dic["id"]
+        raise ValueError(f'Could not find locale named "{locale}", check your API key')
