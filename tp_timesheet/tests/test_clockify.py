@@ -69,7 +69,7 @@ def test_remove_existing_entries(clockify_config):
 
     # Use following date as test date. Random future date in January
     test_date = datetime.date(
-        2022 + random.randrange(1, 10, 1), 1, 1 + random.randrange(0, 30, 1)
+        2025 + random.randrange(0, 10, 1), 1, 1 + random.randrange(0, 30, 1)
     )
 
     # Remove all entries incase any are left over from previous tests
@@ -108,7 +108,7 @@ def test_time_entry_tags(clockify_config):
 
     # Use following date as test date. Random future date in January
     test_date = datetime.date(
-        2022 + random.randrange(1, 10, 1), 1, 1 + random.randrange(0, 30, 1)
+        2025 + random.randrange(0, 10, 1), 1, 1 + random.randrange(0, 30, 1)
     )
 
     # Remove all entries incase any are left over from previous tests
