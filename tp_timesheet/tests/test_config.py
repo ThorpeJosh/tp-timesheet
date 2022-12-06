@@ -115,6 +115,8 @@ def test_config_upgrade_process(tmp_v3_config):
         new_parameters["clockify_api_key"],
         new_parameters["locale_tag"],
     ]
+    # Inject fake locale into list for test so is_valid_locale can pass
+    Config.locale_list.append(new_parameters["locale_tag"])
     with mock.patch.object(builtins, "input", lambda _: mock_inputs()):
         Config(config_filename=tmp_v3_config)
 
