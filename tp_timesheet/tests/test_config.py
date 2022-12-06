@@ -3,6 +3,7 @@ import builtins
 import os
 import sys
 import configparser
+import uuid
 import pytest
 import mock
 from tp_timesheet.config import Config
@@ -19,7 +20,7 @@ def fixture_create_tmp_mock_config():
     It then cleans up the tmp file after the test has run
     """
     # Fake config loaded by pytest
-    test_config_path = Config.CONFIG_DIR.joinpath("tmp_pytest.conf")
+    test_config_path = Config.CONFIG_DIR.joinpath(f"tmp_pytest_{uuid.uuid4().hex}.conf")
     config_str = """
 [configuration]
 tp_email = fake@email.com
@@ -40,7 +41,7 @@ def fixture_create_tmp_clockify_api_config():
     It then cleans up the tmp file after the test has run
     """
     # Fake config loaded by pytest
-    test_config_path = Config.CONFIG_DIR.joinpath("tmp_pytest.conf")
+    test_config_path = Config.CONFIG_DIR.joinpath(f"tmp_pytest_{uuid.uuid4().hex}.conf")
     if os.getenv("CLOCKIFY_CRED"):
         api_key = os.getenv("CLOCKIFY_CRED")
     else:
@@ -66,7 +67,7 @@ def fixture_create_v3_0_0_config():
     It then cleans up the tmp file after the test has run
     """
     # Fake config loaded by pytest
-    test_config_path = Config.CONFIG_DIR.joinpath("tmp_pytest.conf")
+    test_config_path = Config.CONFIG_DIR.joinpath(f"tmp_pytest_{uuid.uuid4().hex}.conf")
     config_str = """
 [configuration]
 tp_email = fake@email.com
