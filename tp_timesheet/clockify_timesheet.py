@@ -175,7 +175,7 @@ class Clockify:
             if dic["name"] == project:
                 return dic["id"]
         raise ValueError(
-            f'Could not find project named "{project}", check your API key'
+            f'Could not find project named "{project}", check your project name'
         )
 
     def _get_task_id(self, task_short):
@@ -191,7 +191,7 @@ class Clockify:
         for dic in request_list:
             if dic["name"] == task:
                 return dic["id"]
-        raise ValueError(f'Could not find task named "{task}", check your API key')
+        raise ValueError(f'Could not find task named "{task}", check your task name')
 
     def _get_locale_id(self, locale):
         get_request = requests.get(
@@ -204,4 +204,6 @@ class Clockify:
         for dic in request_list:
             if dic["name"] == locale:
                 return dic["id"]
-        raise ValueError(f'Could not find locale named "{locale}", check your API key')
+        raise ValueError(
+            f'Could not find locale named "{locale}", check your locale tag'
+        )

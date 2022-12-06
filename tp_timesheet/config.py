@@ -29,7 +29,7 @@ class Config:
         "clockify_api_key": "AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234AbCD1234"
     }
     locale_list = ["en_AU", "en_SG", "ko_KR", "ms_MY", "th_TH"]
-    locale_tag = {"locale_tag": "en_AU"}
+    locale_tag = {"locale_tag": "xx_XX"}
     DEFAULT_CONF = {
         **sanity_check_bool_dict,
         **sanity_check_range_dict,
@@ -116,7 +116,6 @@ class Config:
         len_api = len(api_key) > 40
         return regex_api & len_api
 
-    # pylint:disable = too-many-function-args
     @classmethod
     def is_valid_locale(cls, locale):
         """Check locale is valid"""
