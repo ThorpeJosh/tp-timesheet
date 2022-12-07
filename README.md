@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
 [![PyPI license](https://img.shields.io/pypi/l/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
 
-Automated submission of TP timesheets
+Automated submission of TP timesheets. Version<1.0.0 carries out the submission only on the web form while Version>=1.0.0 also submits on the Clockify application.
 ## Installation
 ### Install
 This tool is published on pypi so from any terminal with python3 installed run:
@@ -34,14 +34,14 @@ tp-timesheet --help
 ### Common cli options
 
 ```bash
-# submit today
+# submit live hours (default) for today
 tp-timesheet --start today
 
-# submit for next 5 days
+# submit live hours (default) for next 5 days
 tp-timesheet --start today --count 5
 
-# submit for Mon 3/10/22 to Thursday 6/10/22
-tp-timesheet --start '3/10/22' --count 5
+# submit for Mon 3/10/22 to Thursday 6/10/22 with a task of Out Of Office (OOO)
+tp-timesheet --start '3/10/22' --count 5 -t OOO
 
 # Schedule the form to submit automatically on weekdays
 tp-timesheet --automate weekdays
@@ -57,6 +57,11 @@ Install the dev environment and run tool locally:
 pip install -e .[dev]
 
 tp-timesheet --help
+```
+
+note: if zsh is used, install the dev environment with:
+```bash
+pip install -e ".[dev]"
 ```
 ### Contributing 
 To run checks prior to committing

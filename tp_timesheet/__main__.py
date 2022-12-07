@@ -74,11 +74,13 @@ def parse_args():
         "--version", action="version", version=f"%(prog)s {__version__}"
     )
     parser.add_argument(
+        "-t",
         "--task",
         type=str,
         default="live",
+        choices=["holiday", "live", "OOO", "training"],
         help="The type of task for the clockify submission. Specify task name "
-        + "if it is anything other than 'live'. Put the task name (training, OOO, holiday) in small letters",
+        + "if it is anything other than 'live'. Put the task name (e.g., training, OOO, holiday)",
     )
     return parser.parse_args()
 
