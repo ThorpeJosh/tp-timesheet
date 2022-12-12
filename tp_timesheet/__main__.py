@@ -76,13 +76,23 @@ def parse_args():
     parser.add_argument(
         "-t",
         "--task",
-        type=str,
-        default="live",
-        choices=["holiday", "live", "OOO", "training"],
+        action="append",
+        nargs=2,
+        metavar=("task", "hour"),
         help="The type of task for the clockify submission. Specify task name "
-        + "if it is anything other than 'live'. Put the task name (e.g., training, OOO, holiday)",
+        + "if it is anything other than 'live'. Put the task name (live, idle, training, issue, OOO, holiday) in small letters",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # postprocessing args
+    args.task = [["live", "8"]] if not args.task else args.task  # default value
+    if sum([int(h) for (t, h) in args.task]) != 8:
+        raise ValueError(
+            f"Please make sure that the summation of the hours is equal to 8. (Given : {sum([int(h) for t,h in args.task])} hours)"
+        )
+    args.task = dict(args.task)
+    logger.debug("Given task and hour pairs : {}".format(args.task))
+    return args
 
 
 def run():
@@ -97,9 +107,7 @@ def run():
 
     try:
         DockerHandler.install_and_launch_docker()
-        clockify = Clockify(
-            config.CLOCKIFY_API_KEY, task=args.task, locale=config.LOCALE
-        )
+        clockify = Clockify(config.CLOCKIFY_API_KEY, locale=config.LOCALE)
 
         # Automate Mode
         if args.automate is not None:
@@ -124,19 +132,16 @@ def run():
         if not assert_start_date(start_date):
             logger.critical("Start date failed sanity check. Aborting program")
             sys.exit(1)
-        dates = get_working_dates(
-            start=start_date, count=args.count, cal=cal, working_hours=args.hours
+        working_dates, holidays = get_working_dates(
+            start=start_date, count=args.count, cal=cal
         )
 
-        if not dates:
-            logger.info(
-                "Submitted dates fall on weekends, form submission is not required."
-            )
-            return
-
-        string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
+        logger.info("Date(s) (yyyy-mm-dd) to be submitted for %s:", config.EMAIL)
         logger.info(
-            "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
+            "\tWorking days : %s", [f"{date}: 8 hours" for date in working_dates]
+        )
+        logger.info(
+            "\tHolidays : %s", [f"{date}: 0 hours(holiday)" for date in holidays]
         )
 
         docker_handler = DockerHandler()
@@ -145,17 +150,28 @@ def run():
         logger.debug("Launching docker container for selenium backend")
         docker_handler.run_container()
 
-        for (date, hours) in dates:
+        for date in working_dates:
             submit_timesheet(
                 config.URL,
                 config.EMAIL,
                 date,
                 verbose=args.verbose,
                 dry_run=args.dry_run,
-                working_hours=hours,
+                tasks=args.task,
             )
+            clockify.submit_clockify(date, args.task, dry_run=args.dry_run)
 
-            clockify.submit_clockify(date, working_hours=hours, dry_run=args.dry_run)
+        for date in holidays:
+            submit_timesheet(
+                config.URL,
+                config.EMAIL,
+                date,
+                verbose=args.verbose,
+                dry_run=args.dry_run,
+                working_hours=0,
+                tasks=["live", "0"],
+            )
+            clockify.submit_clockify(date, args.task, dry_run=args.dry_run)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":

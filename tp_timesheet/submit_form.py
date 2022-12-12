@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 DESKTOP_PATH = os.path.join(os.path.join(os.path.expanduser("~")), "Desktop")
 
 
-def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hours=8):
+def submit_timesheet(url, email, date, tasks, verbose=False, dry_run=False):
     """submit tp timesheet through selenium webdriver"""
     if not isinstance(date, datetime.date):
         raise TypeError(
@@ -61,24 +61,24 @@ def submit_timesheet(url, email, date, verbose=False, dry_run=False, working_hou
             By.XPATH,
             "(//input)[3]",
         )
-        live_hours.send_keys(working_hours)
+        live_hours.send_keys(tasks.get("live", 0))
 
         # find and fill in the rest of the hours
         idle_hours = browser.find_element(
             By.XPATH,
             "(//input)[4]",
         )
-        idle_hours.send_keys("0")
+        idle_hours.send_keys(tasks.get("idle", 0))
         training_hours = browser.find_element(
             By.XPATH,
             "(//input)[5]",
         )
-        training_hours.send_keys("0")
+        training_hours.send_keys(tasks.get("training", 0))
         tool_issues = browser.find_element(
             By.XPATH,
             "(//input)[6]",
         )
-        tool_issues.send_keys("0")
+        tool_issues.send_keys(tasks.get("issue", 0))
 
         if dry_run:
             logger.debug("This is a DRY-RUN, submit button is not clicked")

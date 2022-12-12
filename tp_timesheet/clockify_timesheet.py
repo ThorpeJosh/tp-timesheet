@@ -21,7 +21,7 @@ class Clockify:
 
     api_base_endpoint = "https://api.clockify.me/api/v1"
 
-    def __init__(self, api_key, task, locale):
+    def __init__(self, api_key, locale):
         self.api_key = api_key
 
         (
@@ -30,11 +30,9 @@ class Clockify:
             self.timezone,
             self.start_time,
         ) = self._get_workspace_user_id()
-        self.project_id = self._get_project_id(task)
-        self.task_id = self._get_task_id(task)
         self.locale_id = self._get_locale_id(locale)
 
-    def submit_clockify(self, date, working_hours, dry_run=False):
+    def submit_clockify(self, date, task_and_hours, dry_run=False):
         """Submit entry to clockify"""
 
         if not dry_run:
@@ -42,16 +40,19 @@ class Clockify:
             self.delete_time_entry(date)
 
         # post entry
-        self._post_time_entry(date, working_hours, dry_run)
+        start_time = self.start_time
+        for (task, hour) in task_and_hours:
+            self._post_time_entry(date, task, start_time, hour, dry_run)
+            start_time = start_time + hour
 
-    def _post_time_entry(self, date, working_hours, dry_run):
+    def _post_time_entry(self, date, task, start_time, hour, dry_run):
         """Post a time entry to clockify"""
 
         # Timestamps via API need to be UTC
         # Create a timezone aware datetime object
         tz_file = dateutil.tz.gettz(self.timezone)
-        start_dt = datetime.datetime.combine(date, self.start_time, tzinfo=tz_file)
-        end_dt = start_dt + datetime.timedelta(hours=working_hours)
+        start_dt = datetime.datetime.combine(date, start_time, tzinfo=tz_file)
+        end_dt = start_dt + datetime.timedelta(hours=hour)
         # Generate ISO (POSIX datetime) strings in UTC format
         start_timestamp = start_dt.astimezone(datetime.timezone.utc).strftime(
             "%Y-%m-%dT%H:%M:%SZ"
@@ -60,12 +61,14 @@ class Clockify:
             "%Y-%m-%dT%H:%M:%SZ"
         )
 
+        project_id = self._get_project_id(task)
+        task_id = self._get_task_id(project_id, task)
         time_entry_json = {
             "start": start_timestamp,
             "end": end_timestamp,
             "billable": True,
-            "projectId": self.project_id,
-            "taskId": self.task_id,
+            "projectId": project_id,
+            "taskId": task_id,
             "tagIds": [self.locale_id],
         }
 
@@ -170,6 +173,7 @@ class Clockify:
         )
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
+
         _, project = self.task_project_dict[task_short]
         for dic in request_list:
             if dic["name"] == project:
@@ -178,18 +182,20 @@ class Clockify:
             f'Could not find project named "{project}", check your project name'
         )
 
-    def _get_task_id(self, task_short):
+    def _get_task_id(self, project_id, task_short):
         """Send request to get task id"""
+
         get_request = requests.get(
-            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{self.project_id}/tasks",
+            f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{project_id}/tasks",
             headers={"X-Api-Key": self.api_key},
             timeout=2,
         )
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
-        task, _ = self.task_project_dict[task_short]
+
+        task_full, _ = self.task_project_dict[task_short]
         for dic in request_list:
-            if dic["name"] == task:
+            if dic["name"] == task_full:
                 return dic["id"]
         raise ValueError(f'Could not find task named "{task}", check your task name')
 
