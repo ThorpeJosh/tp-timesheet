@@ -171,7 +171,7 @@ def run():
                 working_hours=0,
                 tasks=["live", "0"],
             )
-            clockify.submit_clockify(date, args.task, dry_run=args.dry_run)
+            clockify.submit_clockify(date, [["holiday", 8]], dry_run=args.dry_run)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":
