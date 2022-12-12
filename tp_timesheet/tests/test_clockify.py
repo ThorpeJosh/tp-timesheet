@@ -11,7 +11,7 @@ from tp_timesheet.config import Config
 from .test_config import fixture_create_tmp_clockify_api_config
 
 WORKSPACE_ID = "5fa423e902f38d2ce68f3169"
-PROJECT_IDS = "6377ce7d0c7a4c4566b89d41"
+PROJECT_ID = "6377ce7d0c7a4c4566b89d41"
 TASK_IDS = [
     "6377ce9c0c7a4c4566b89ef7",  # Live hours
     "6377cea7d3400c1c832e48cb",  # Training
@@ -25,20 +25,19 @@ def test_ids(clockify_config):
     Test for checking validity of workspace, project and task ids obtained from request
     """
     config = Config(config_filename=clockify_config)
-    tasks = ["live", "training", "OOO", "holiday"]
-    for selected_t in tasks:
-        clockify_val = Clockify(
-            api_key=config.CLOCKIFY_API_KEY, task=selected_t, locale=config.LOCALE
-        )
+    clockify_val = Clockify(api_key=config.CLOCKIFY_API_KEY, locale=config.LOCALE)
+    assert (
+        clockify_val.workspace_id == WORKSPACE_ID
+    ), f"Workspace ID Error, expected: {WORKSPACE_ID}, result:{clockify_val.workspace_id}"
+
+    for task_idx, task_short in enumerate(["live", "training", "OOO", "holiday"]):
+        project_id = clockify_val._get_project_id(task_short)
         assert (
-            clockify_val.workspace_id == WORKSPACE_ID
-        ), f"Workspace ID Error, expected: {WORKSPACE_ID}, result:{clockify_val.workspace_id}"
+        ), f"Project ID Error, expected: {PROJECT_ID}, result:{project_id}"
+        task_id = clockify_val._get_task_id(project_id, task_short)
         assert (
-            clockify_val.project_id == PROJECT_IDS
-        ), f"Project ID Error, expected: {PROJECT_IDS}, result:{clockify_val.project_id}"
-        assert (
-            clockify_val.task_id in TASK_IDS
-        ), f"Task ID Error, expected value from: {TASK_IDS}, result:{clockify_val.task_id}"
+            task_id == TASK_IDS[task_idx]
+        ), f"Project ID Error, expected: {TASK_IDS[task_idx]}, result:{task_id}"
 
 
 def test_remove_existing_entries(clockify_config):
@@ -60,9 +59,7 @@ def test_remove_existing_entries(clockify_config):
 
     # Instantiate a Clockify object
     config = Config(config_filename=clockify_config)
-    clockify = Clockify(
-        api_key=config.CLOCKIFY_API_KEY, task="training", locale=config.LOCALE
-    )
+    clockify = Clockify(api_key=config.CLOCKIFY_API_KEY, locale=config.LOCALE)
 
     # Use following date as test date. Random future date in January
     test_date = datetime.date(
@@ -76,15 +73,18 @@ def test_remove_existing_entries(clockify_config):
     assert_number_of_entries(test_date, 0)
 
     # Add a clockify entry with 1 hour
-    clockify.submit_clockify(test_date, 1)
+    clockify.submit_clockify(test_date, [["live", 4]])
 
     # Check only one entry exists
     assert_number_of_entries(test_date, 1)
 
-    # Resubmit clockify entry with 4 hours
-    clockify.submit_clockify(test_date, 4)
+    # Remove all entries
+    clockify.delete_time_entry(test_date)
 
-    # Check only one entry exists still
+    # Resubmit clockify entry with 4 hours
+    clockify.submit_clockify(test_date, [["OOO", 4]])
+
+    # Check only one entry exists
     assert_number_of_entries(test_date, 1)
 
     # Remove all entries
@@ -99,9 +99,7 @@ def test_time_entry_tags(clockify_config):
 
     # Instantiate a Clockify object
     config = Config(config_filename=clockify_config)
-    clockify = Clockify(
-        api_key=config.CLOCKIFY_API_KEY, task="training", locale=config.LOCALE
-    )
+    clockify = Clockify(api_key=config.CLOCKIFY_API_KEY, locale=config.LOCALE)
 
     # Use following date as test date. Random future date in January
     test_date = datetime.date(
@@ -112,7 +110,7 @@ def test_time_entry_tags(clockify_config):
     clockify.delete_time_entry(test_date)
 
     # Add a clockify entry
-    clockify.submit_clockify(test_date, 1)
+    clockify.submit_clockify(test_date, [["live", 8]])
 
     # Check entry contains a tag with the intended locale
     task_id = clockify.get_time_entry_id(test_date)
