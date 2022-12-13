@@ -80,7 +80,7 @@ def parse_args():
         nargs=2,
         metavar=("task", "hour"),
         help="The type of task for the clockify submission. Specify task name "
-        + "if it is anything other than 'live'. Put the task name (live, idle, training, issue, OOO, holiday) in small letters",
+        + "if it is anything other than 'live'. Put the task name (idle, training, issue, OOO, holiday)",
     )
     args = parser.parse_args()
 
