@@ -47,12 +47,6 @@ def parse_args():
         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week",
     )
     parser.add_argument(
-        "--hours",
-        type=int,
-        default=8,
-        help="Number of hours to submit. Default=8",
-    )
-    parser.add_argument(
         "-n",
         "--notification",
         action="store_true",
@@ -80,7 +74,8 @@ def parse_args():
         nargs=2,
         metavar=("task", "hour"),
         help="The type of task for the clockify submission. Specify task name "
-        + "if it is anything other than 'live'. Put the task name (idle, training, issue, OOO, holiday)",
+        + "if it is anything other than 'live'. Put the task name(idle, training, issue, OOO, holiday).\n"
+        + "Passing multiple task-hour pair is also acceptable. (ex, \"--task live 4 --task OOO 4\" for afternoon OOO.)"
     )
     args = parser.parse_args()
 
