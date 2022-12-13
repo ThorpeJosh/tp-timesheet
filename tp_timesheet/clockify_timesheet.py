@@ -41,7 +41,7 @@ class Clockify:
 
         # post entry
         start_time = self.start_time
-        for (task, hour) in task_and_hours:
+        for (task, hour) in task_and_hours.items():
             self._post_time_entry(date, task, start_time, hour, dry_run)
             start_time = datetime.time(start_time.hour + hour, 0)
 

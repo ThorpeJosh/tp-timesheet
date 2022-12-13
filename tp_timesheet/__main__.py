@@ -90,7 +90,7 @@ def parse_args():
         raise ValueError(
             f"Please make sure that the summation of the hours is equal to 8. (Given : {sum([int(h) for t,h in args.task])} hours)"
         )
-    args.task = dict(args.task)
+    args.task = {k:int(v) for (k,v) in args.task}
     logger.debug("Given task and hour pairs : {}".format(args.task))
     return args
 
