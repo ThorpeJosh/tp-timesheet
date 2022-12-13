@@ -61,8 +61,8 @@ class Clockify:
             "%Y-%m-%dT%H:%M:%SZ"
         )
 
-        project_id = self._get_project_id(task)
-        task_id = self._get_task_id(project_id, task)
+        project_id = self.get_project_id(task)
+        task_id = self.get_task_id(project_id, task)
         time_entry_json = {
             "start": start_timestamp,
             "end": end_timestamp,
@@ -164,7 +164,7 @@ class Clockify:
         start_time = datetime.datetime.strptime(start_time_str, "%H:%M").time()
         return workspace_id, user_id, timezone, start_time
 
-    def _get_project_id(self, task_short):
+    def get_project_id(self, task_short):
         """Send request to get project id"""
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects",
@@ -182,7 +182,7 @@ class Clockify:
             f'Could not find project named "{project}", check your project name'
         )
 
-    def _get_task_id(self, project_id, task_short):
+    def get_task_id(self, project_id, task_short):
         """Send request to get task id"""
 
         get_request = requests.get(
@@ -197,7 +197,9 @@ class Clockify:
         for dic in request_list:
             if dic["name"] == task_full:
                 return dic["id"]
-        raise ValueError(f'Could not find task named "{task}", check your task name')
+        raise ValueError(
+            f'Could not find task named "{task_short}", check your task name'
+        )
 
     def _get_locale_id(self, locale):
         get_request = requests.get(

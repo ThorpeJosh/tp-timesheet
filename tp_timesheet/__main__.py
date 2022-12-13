@@ -75,18 +75,19 @@ def parse_args():
         metavar=("task", "hour"),
         help="The type of task for the clockify submission. Specify task name "
         + "if it is anything other than 'live'. Put the task name(idle, training, issue, OOO, holiday).\n"
-        + "Passing multiple task-hour pair is also acceptable. (ex, \"--task live 4 --task OOO 4\" for afternoon OOO.)"
+        + 'Passing multiple task-hour pair is also acceptable. (ex, "--task live 4 --task OOO 4" for afternoon OOO.)',
     )
     args = parser.parse_args()
 
     # postprocessing args
     args.task = [["live", "8"]] if not args.task else args.task  # default value
-    if sum([int(h) for (t, h) in args.task]) != 8:
+    args.task = {k: int(v) for (k, v) in args.task}
+    if sum(args.task.values()) != 8:
         raise ValueError(
-            f"Please make sure that the summation of the hours is equal to 8. (Given : {sum([int(h) for t,h in args.task])} hours)"
+            "Please make sure that the summation of the hours is equal to 8. "
+            + f"(Given: {sum(args.task.values())} hours)"
         )
-    args.task = {k:int(v) for (k,v) in args.task}
-    logger.debug("Given task and hour pairs : {}".format(args.task))
+    logger.debug("Given task and hour pairs : %s", args.task)
     return args
 
 
@@ -163,19 +164,18 @@ def run():
                 date,
                 verbose=args.verbose,
                 dry_run=args.dry_run,
-                working_hours=0,
                 tasks=["live", "0"],
             )
             clockify.submit_clockify(date, [["holiday", 8]], dry_run=args.dry_run)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":
-            if len(dates) == 1:
+            if len(working_dates) == 1:
                 notification_text = (
                     f"Timesheet for {args.start.lower()} is successfully submitted."
                 )
             else:
-                notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
+                notification_text = f"Timesheets from {working_dates[0]} to {working_dates[-1]} are successfully submitted."
             if args.dry_run:
                 notification_text = f"[DRY_RUN] {notification_text}"
             os.system(

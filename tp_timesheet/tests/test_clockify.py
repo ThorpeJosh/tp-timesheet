@@ -31,10 +31,10 @@ def test_ids(clockify_config):
     ), f"Workspace ID Error, expected: {WORKSPACE_ID}, result:{clockify_val.workspace_id}"
 
     for task_idx, task_short in enumerate(["live", "training", "OOO", "holiday"]):
-        project_id = clockify_val._get_project_id(task_short)
+        project_id = clockify_val.get_project_id(task_short)
         assert (
+            project_id == PROJECT_ID
         ), f"Project ID Error, expected: {PROJECT_ID}, result:{project_id}"
-        task_id = clockify_val._get_task_id(project_id, task_short)
         assert (
             task_id == TASK_IDS[task_idx]
         ), f"Project ID Error, expected: {TASK_IDS[task_idx]}, result:{task_id}"
@@ -73,7 +73,7 @@ def test_remove_existing_entries(clockify_config):
     assert_number_of_entries(test_date, 0)
 
     # Add a clockify entry with 1 hour
-    clockify.submit_clockify(test_date, [["live", 4]])
+    clockify.submit_clockify(test_date, {"live": 4})
 
     # Check only one entry exists
     assert_number_of_entries(test_date, 1)
@@ -82,7 +82,7 @@ def test_remove_existing_entries(clockify_config):
     clockify.delete_time_entry(test_date)
 
     # Resubmit clockify entry with 4 hours
-    clockify.submit_clockify(test_date, [["OOO", 4]])
+    clockify.submit_clockify(test_date, {"OOO": 4})
 
     # Check only one entry exists
     assert_number_of_entries(test_date, 1)
@@ -110,7 +110,7 @@ def test_time_entry_tags(clockify_config):
     clockify.delete_time_entry(test_date)
 
     # Add a clockify entry
-    clockify.submit_clockify(test_date, [["live", 8]])
+    clockify.submit_clockify(test_date, {"live": 8})
 
     # Check entry contains a tag with the intended locale
     task_id = clockify.get_time_entry_id(test_date)
