@@ -75,7 +75,7 @@ def parse_args():
         metavar=("task", "hour"),
         help="The type of task for the clockify submission. Specify task name "
         + "if it is anything other than 'live'. Put the task name(idle, training, issue, OOO, holiday).\n"
-        + 'Passing multiple task-hour pair is also acceptable. (ex, "--task live 4 --task OOO 4" for afternoon OOO.)',
+        + 'Passing multiple task-hour pair is also acceptable. (E.g. "--task live 4 --task OOO 4" for afternoon OOO.)',
     )
     args = parser.parse_args()
 
