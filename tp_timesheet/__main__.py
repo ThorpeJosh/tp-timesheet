@@ -81,7 +81,7 @@ def parse_args():
 
     # postprocessing args
     args.task = [["live", "8"]] if not args.task else args.task  # default value
-    args.task = {k: int(v) for (k, v) in args.task}
+    args.task = {task_name: int(hours) for (task_name, hours) in args.task}
     if sum(args.task.values()) != 8:
         raise ValueError(
             "Please make sure that the summation of the hours is equal to 8. "
