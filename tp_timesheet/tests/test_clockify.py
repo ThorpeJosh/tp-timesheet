@@ -72,7 +72,7 @@ def test_remove_existing_entries(clockify_config):
     # Check no entry exists
     assert_number_of_entries(test_date, 0)
 
-    # Add a clockify entry with 1 hour
+    # Add a clockify entry with 4 hours
     clockify.submit_clockify(test_date, {"live": 4})
 
     # Check only one entry exists
