@@ -175,7 +175,9 @@ def run():
                     f"Timesheet for {args.start.lower()} is successfully submitted."
                 )
             else:
-                notification_text = f"Timesheets from {working_dates[0]} to {working_dates[-1]} are successfully submitted."
+                date_0 = working_dates[0]
+                date_f = working_dates[-1]
+                notification_text = f"Timesheets from {date_0} to {date_f} are successfully submitted."
             if args.dry_run:
                 notification_text = f"[DRY_RUN] {notification_text}"
             os.system(
