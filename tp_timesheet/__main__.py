@@ -80,6 +80,7 @@ def parse_args():
     args = parser.parse_args()
 
     # postprocessing args
+    logger.debug("Given task and hour pairs : %s", args.task)
     args.task = [["live", "8"]] if not args.task else args.task  # default value
     args.task = {task_name: int(hours) for (task_name, hours) in args.task}
     if sum(args.task.values()) != 8:
@@ -87,7 +88,6 @@ def parse_args():
             "Please make sure that the summation of the hours is equal to 8. "
             + f"(Given: {sum(args.task.values())} hours)"
         )
-    logger.debug("Given task and hour pairs : %s", args.task)
     return args
 
 
@@ -132,12 +132,12 @@ def run():
             start=start_date, count=args.count, cal=cal
         )
 
-        logger.info("Date(s) (yyyy-mm-dd) to be submitted for %s:", config.EMAIL)
         logger.info(
-            "\tWorking days : %s", [f"{date}: 8 hours" for date in working_dates]
-        )
-        logger.info(
-            "\tHolidays : %s", [f"{date}: 0 hours(holiday)" for date in holidays]
+            "Try to submitting %d report(s) for %s... (working days: %s / holidays : %s)",
+            args.count,
+            config.EMAIL,
+            working_dates,
+            holidays,
         )
 
         docker_handler = DockerHandler()

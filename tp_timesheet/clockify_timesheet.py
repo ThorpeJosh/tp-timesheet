@@ -18,6 +18,9 @@ class Clockify:
         "OOO": ("Out Of Office", "Jupiter Staffing APAC"),
         "holiday": ("Holiday", "Jupiter Staffing APAC"),
     }
+    project_id_cache = {}
+    task_id_cache = {}
+    locale_id_cache = {}
 
     api_base_endpoint = "https://api.clockify.me/api/v1"
 
@@ -166,6 +169,11 @@ class Clockify:
 
     def get_project_id(self, task_short):
         """Send request to get project id"""
+        _, project = self.task_project_dict[task_short]
+
+        if project in self.project_id_cache:
+            return self.project_id_cache[project]
+
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects",
             headers={"X-Api-Key": self.api_key},
@@ -174,9 +182,9 @@ class Clockify:
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
 
-        _, project = self.task_project_dict[task_short]
         for dic in request_list:
             if dic["name"] == project:
+                self.project_id_cache[project] = dic["id"]
                 return dic["id"]
         raise ValueError(
             f'Could not find project named "{project}", check your project name'
@@ -184,6 +192,10 @@ class Clockify:
 
     def get_task_id(self, project_id, task_short):
         """Send request to get task id"""
+        task_full, _ = self.task_project_dict[task_short]
+
+        if task_full in self.task_id_cache:
+            return self.task_id_cache[task_full]
 
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{project_id}/tasks",
@@ -193,15 +205,18 @@ class Clockify:
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
 
-        task_full, _ = self.task_project_dict[task_short]
         for dic in request_list:
             if dic["name"] == task_full:
+                self.task_id_cache[task_full] = dic["id"]
                 return dic["id"]
         raise ValueError(
             f'Could not find task named "{task_short}", check your task name'
         )
 
     def _get_locale_id(self, locale):
+        if locale in self.locale_id_cache:
+            return self.locale_id_cache[locale]
+
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/tags",
             headers={"X-Api-Key": self.api_key},
@@ -211,6 +226,7 @@ class Clockify:
         request_list = json.loads(get_request.text)
         for dic in request_list:
             if dic["name"] == locale:
+                self.locale_id_cache[locale] = dic["id"]
                 return dic["id"]
         raise ValueError(
             f'Could not find locale named "{locale}", check your locale tag'

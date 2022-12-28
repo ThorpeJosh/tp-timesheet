@@ -78,9 +78,6 @@ def test_remove_existing_entries(clockify_config):
     # Check only one entry exists
     assert_number_of_entries(test_date, 1)
 
-    # Remove all entries
-    clockify.delete_time_entry(test_date)
-
     # Resubmit clockify entry with 4 hours
     clockify.submit_clockify(test_date, {"OOO": 4})
 
