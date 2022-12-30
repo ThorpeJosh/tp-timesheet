@@ -15,8 +15,8 @@ class Clockify:
     task_project_dict = {
         "live": ("Live hours", "Jupiter Staffing APAC"),
         "training": ("Training", "Jupiter Staffing APAC"),
-        "OOO": ("Out Of Office", "Jupiter Non-Billable"),
-        "holiday": ("Holiday", "Jupiter Non-Billable"),
+        "OOO": ("Out Of Office", "Jupiter Staffing APAC"),
+        "holiday": ("Holiday", "Jupiter Staffing APAC"),
     }
 
     api_base_endpoint = "https://api.clockify.me/api/v1"

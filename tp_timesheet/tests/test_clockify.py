@@ -18,8 +18,8 @@ PROJECT_IDS = [
 TASK_IDS = [
     "6377ce9c0c7a4c4566b89ef7",  # Live hours
     "6377cea7d3400c1c832e48cb",  # Training
-    "63120a6db1479f58e2d04b77",  # Out Of Office
-    "6368f01245b6796dca64e8f5",  # Holiday
+    "63ab0fa9563a041b5b01148a",  # Out Of Office
+    "63ab0fa627acb5055e805c0b",  # Holiday
 ]
 
 
