@@ -11,15 +11,12 @@ from tp_timesheet.config import Config
 from .test_config import fixture_create_tmp_clockify_api_config
 
 WORKSPACE_ID = "5fa423e902f38d2ce68f3169"
-PROJECT_IDS = [
-    "6377ce7d0c7a4c4566b89d41",  # Jupiter Staffing APAC
-    "63120a634420051596d195ee",  # Jupiter Non-Billable
-]
+PROJECT_IDS = "6377ce7d0c7a4c4566b89d41"
 TASK_IDS = [
     "6377ce9c0c7a4c4566b89ef7",  # Live hours
     "6377cea7d3400c1c832e48cb",  # Training
-    "63120a6db1479f58e2d04b77",  # Out Of Office
-    "6368f01245b6796dca64e8f5",  # Holiday
+    "63ab0fa9563a041b5b01148a",  # Out Of Office
+    "63ab0fa627acb5055e805c0b",  # Holiday
 ]
 
 
@@ -37,8 +34,8 @@ def test_ids(clockify_config):
             clockify_val.workspace_id == WORKSPACE_ID
         ), f"Workspace ID Error, expected: {WORKSPACE_ID}, result:{clockify_val.workspace_id}"
         assert (
-            clockify_val.project_id in PROJECT_IDS
-        ), f"Project ID Error, expected value from: {PROJECT_IDS}, result:{clockify_val.project_id}"
+            clockify_val.project_id == PROJECT_IDS
+        ), f"Project ID Error, expected: {PROJECT_IDS}, result:{clockify_val.project_id}"
         assert (
             clockify_val.task_id in TASK_IDS
         ), f"Task ID Error, expected value from: {TASK_IDS}, result:{clockify_val.task_id}"
