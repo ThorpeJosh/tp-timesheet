@@ -3,9 +3,6 @@ from setuptools import setup
 from tp_timesheet import __version__ as version
 
 REQUIREMENTS = [
-    "Pillow~=9.2",
-    "selenium~=4.4",
-    "docker~=6.0",
     "croniter~=1.3",
     "python-crontab~=2.6",
     "python-dateutil~=2.8",

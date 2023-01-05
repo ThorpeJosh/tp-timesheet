@@ -4,12 +4,8 @@ import os
 import sys
 import argparse
 import warnings
-import selenium
-import docker
 from workalendar.asia import Singapore
 from tp_timesheet import __version__
-from tp_timesheet.docker_handler import DockerHandler, DockerHandlerException
-from tp_timesheet.submit_form import submit_timesheet
 from tp_timesheet.date_utils import get_working_dates, get_start_date, assert_start_date
 from tp_timesheet.schedule import ScheduleForm
 from tp_timesheet.config import Config
@@ -90,13 +86,10 @@ def run():
     # pylint: disable=too-many-statements
     args = parse_args()
     notification_text = None
-    docker_handler = None
-    notification_flag = False
 
     config = Config(verbose=args.verbose)
 
     try:
-        DockerHandler.install_and_launch_docker()
         clockify = Clockify(
             config.CLOCKIFY_API_KEY, task=args.task, locale=config.LOCALE
         )
@@ -135,26 +128,9 @@ def run():
             return
 
         string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
-        logger.info(
-            "Date(s) (yyyy-mm-dd) to be submitted for %s: %s", config.EMAIL, string_list
-        )
-
-        docker_handler = DockerHandler()
-        logger.debug("Pulling latest image")
-        docker_handler.pull_image()
-        logger.debug("Launching docker container for selenium backend")
-        docker_handler.run_container()
+        logger.info("Date(s) (yyyy-mm-dd) to be submitted: %s", string_list)
 
         for (date, hours) in dates:
-            submit_timesheet(
-                config.URL,
-                config.EMAIL,
-                date,
-                verbose=args.verbose,
-                dry_run=args.dry_run,
-                working_hours=hours,
-            )
-
             clockify.submit_clockify(date, working_hours=hours, dry_run=args.dry_run)
 
         # Notification (OSX only)
@@ -170,32 +146,6 @@ def run():
             os.system(
                 f"""osascript -e 'display notification "{notification_text}" with title "TP Timesheet"'"""
             )
-    except docker.errors.DockerException:
-        notification_text = (
-            "⚠️ TP-timesheet was not submitted successfully. Check if Docker is running"
-        )
-        logger.critical(notification_text, exc_info=True)
-        os.system(
-            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-                    default button "OK" with icon 2'"""
-        )
-    except selenium.common.exceptions.NoSuchElementException:
-        notification_text = "⚠️ TP-timesheet was not submitted successfully. An element on the url \
-was not found by Selenium"
-        logger.critical(notification_text, exc_info=True)
-        os.system(
-            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-                    default button "OK" with icon 2'"""
-        )
-        notification_flag = True
-    except DockerHandlerException as error:
-        notification_text = f"⚠️ TP-timesheet was not submitted successfully. {error}"
-        logger.critical(notification_text, exc_info=True)
-        os.system(
-            f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-                    default button "OK" with icon 2'"""
-        )
-        notification_flag = True
     except Exception:  # pylint: disable=broad-except
         notification_text = "⚠️ TP Timesheet was not submitted successfully."
         logger.critical(notification_text, exc_info=True)
@@ -203,21 +153,6 @@ was not found by Selenium"
             f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
                     default button "OK" with icon 2'"""
         )
-        notification_flag = True
-    finally:
-        try:
-            logger.debug("Cleaning up docker container")
-            if docker_handler is not None:
-                docker_handler.rm_container()
-        except Exception:  # pylint: disable=broad-except
-            notification_text = "Ran into an unexpected error while attempting to clean up docker container"
-            logger.critical(notification_text, exc_info=True)
-            if not notification_flag:
-                # Don't show two notifications sequentially
-                os.system(
-                    f"""osascript -e 'display dialog "{notification_text}" with title "TP Timesheet" buttons "OK" \
-                        default button "OK" with icon 2'"""
-                )
 
 
 if __name__ == "__main__":
