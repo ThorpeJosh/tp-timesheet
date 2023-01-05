@@ -3,7 +3,12 @@
 [![PyPI version](https://img.shields.io/pypi/v/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
 [![PyPI license](https://img.shields.io/pypi/l/tp-timesheet.svg)](https://pypi.org/project/tp-timesheet/)
 
-Automated submission of TP timesheets. Version<1.0.0 carries out the submission only on the web form while Version>=1.0.0 also submits on the Clockify application.
+Automated submission of TP timesheets.
+
+* Version 0.x.x is web form only
+* Version 1.x.x is web + Clockify
+* Version 2.x.x is Clockify only
+
 ## Installation
 ### Install
 This tool is published on pypi so from any terminal with python3 installed run:
