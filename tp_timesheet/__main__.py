@@ -64,7 +64,7 @@ def parse_args():
         "-d",
         "--dry-run",
         action="store_true",
-        help="Dry run mode, runs through as per normal but will not click submit",
+        help="Dry run mode, runs through as per normal but will not submit",
     )
     parser.add_argument(
         "--version", action="version", version=f"%(prog)s {__version__}"
