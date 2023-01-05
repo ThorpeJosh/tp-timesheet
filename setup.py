@@ -6,6 +6,7 @@ REQUIREMENTS = [
     "croniter~=1.3",
     "python-crontab~=2.6",
     "python-dateutil~=2.8",
+    "requests~=2.0",
     "workalendar~=16.4.0",
 ]
 DEV_REQUIREMENTS = {
