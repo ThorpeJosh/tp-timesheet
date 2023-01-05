@@ -2,7 +2,7 @@
 import logging
 from tp_timesheet.config import Config
 
-__version__ = "1.2.1"
+__version__ = "1.3.0"
 
 logger = logging.getLogger(__name__)
 Config.ROOT_LOGGER = logger
