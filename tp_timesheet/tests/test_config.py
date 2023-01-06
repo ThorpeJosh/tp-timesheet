@@ -49,8 +49,6 @@ def fixture_create_tmp_clockify_api_config():
         api_key = config.CLOCKIFY_API_KEY
     config_str = f"""
 [configuration]
-tp_email = fake@email.com
-tp_url = https://example.com/path
 clockify_api_key = {api_key}
 locale_tag = en_SG
     """
