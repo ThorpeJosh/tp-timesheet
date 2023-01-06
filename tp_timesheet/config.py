@@ -53,8 +53,6 @@ class Config:
         config = cls._read_write_config()
 
         # Load global configurations
-        cls.EMAIL = config.get("configuration", "tp_email")
-        cls.URL = config.get("configuration", "tp_url")
         cls.LOCALE = config.get("configuration", "locale_tag")
         cls.SANITY_CHECK_START_DATE = config.get(
             "configuration", next(iter(cls.sanity_check_bool_dict))
@@ -94,22 +92,6 @@ class Config:
         cls.ROOT_LOGGER.addHandler(file_handler)
 
     @staticmethod
-    def is_valid_email(email):
-        """Check email is valid"""
-        return re.search(r"^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$", email)
-
-    @staticmethod
-    def is_valid_url(url):
-        """Check url is valid"""
-        regex = re.compile(
-            r"^https://forms\."  # knowns start to url
-            r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?)"  # domain
-            r"(?:/?|[/?]\S+)$",
-            re.IGNORECASE,
-        )
-        return bool(regex.search(url))
-
-    @staticmethod
     def is_valid_key(api_key):
         """Check api key is valid"""
         regex_api = bool(re.match("^[A-Za-z0-9]*$", api_key))
@@ -131,19 +113,6 @@ class Config:
             logger.info(
                 "No config file was found, creating one at: %s", cls.CONFIG_PATH
             )
-            # Gather input from user to populate the config
-            email = input("Enter TP email:")
-            while not cls.is_valid_email(email):
-                email = input("Invalid email, please try again:")
-            url = input("Enter timesheet url:")
-            while not cls.is_valid_url(url):
-                url = input("Invalid url, please try again:")
-            config["configuration"] = {
-                "tp_email": email,
-                "tp_url": url,
-            }
-            config["configuration"].update(cls.DEFAULT_CONF)
-
             with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
                 config.write(config_file)
 

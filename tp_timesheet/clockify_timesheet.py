@@ -76,7 +76,9 @@ class Clockify:
         }
 
         if dry_run:
-            logger.debug("This is a DRY-RUN, api POST is not being sent")
+            logger.info(
+                "This is a DRY-RUN, api POST is not being sent. Use --verbose to see more."
+            )
             logger.debug("POST:  %s\n", time_entry_json)
         else:
             response = requests.post(
