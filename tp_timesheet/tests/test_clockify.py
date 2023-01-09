@@ -32,6 +32,7 @@ def test_ids(clockify_config):
 
     for task_idx, task_short in enumerate(["live", "training", "OOO", "holiday"]):
         project_id = clockify_val.get_project_id(task_short)
+        task_id = clockify_val.get_task_id(project_id, task_short)
         assert (
             project_id == PROJECT_ID
         ), f"Project ID Error, expected: {PROJECT_ID}, result:{project_id}"

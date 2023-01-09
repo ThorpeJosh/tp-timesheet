@@ -126,9 +126,8 @@ def run():
         )
 
         logger.info(
-            "Try to submitting %d report(s) for %s... (working days: %s / holidays : %s)",
+            "Try to submitting %d report(s)... (working days: %s / holidays : %s)",
             args.count,
-            config.EMAIL,
             working_dates,
             holidays,
         )
