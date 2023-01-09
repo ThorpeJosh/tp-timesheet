@@ -174,7 +174,10 @@ class Clockify:
         _, project = self.task_project_dict[task_short]
 
         if project in self.project_id_cache:
-            return self.project_id_cache[project]
+            project_id = self.project_id_cache[project]
+            logger.debug("Using cached project_id: %s", project_id)
+            return project_id
+        logger.debug("project_id is not found on cache, fetching...")
 
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects",
@@ -186,6 +189,7 @@ class Clockify:
 
         for dic in request_list:
             if dic["name"] == project:
+                logger.debug("Storing fetched project_id in cache: %s", dic["id"])
                 self.project_id_cache[project] = dic["id"]
                 return dic["id"]
         raise ValueError(
@@ -197,7 +201,10 @@ class Clockify:
         task_full, _ = self.task_project_dict[task_short]
 
         if task_full in self.task_id_cache:
-            return self.task_id_cache[task_full]
+            task_id = self.task_id_cache[task_full]
+            logger.debug("Using cached task_id: %s", task_id)
+            return task_id
+        logger.debug("task_id is not found on cache, fetching...")
 
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{project_id}/tasks",
@@ -209,6 +216,7 @@ class Clockify:
 
         for dic in request_list:
             if dic["name"] == task_full:
+                logger.debug("Storing fetched task_id in cache: %s", dic["id"])
                 self.task_id_cache[task_full] = dic["id"]
                 return dic["id"]
         raise ValueError(
