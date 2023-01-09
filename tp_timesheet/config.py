@@ -113,6 +113,8 @@ class Config:
             logger.info(
                 "No config file was found, creating one at: %s", cls.CONFIG_PATH
             )
+            # Set to default config values
+            config["configuration"] = cls.DEFAULT_CONF
             with open(cls.CONFIG_PATH, "w", encoding="utf8") as config_file:
                 config.write(config_file)
 
