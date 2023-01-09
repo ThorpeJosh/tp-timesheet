@@ -46,7 +46,10 @@ class Clockify:
         start_time = self.start_time
         for (task, hour) in task_and_hours.items():
             self._post_time_entry(date, task, start_time, hour, dry_run)
-            start_time = (datetime.datetime.combine(datetime.date(1,1,1), start_time) + datetime.timedelta(hours=hour)).time()
+            start_time = (
+                datetime.datetime.combine(datetime.date(1, 1, 1), start_time)
+                + datetime.timedelta(hours=hour)
+            ).time()
 
     def _post_time_entry(self, date, task, start_time, hour, dry_run):
         """Post a time entry to clockify"""
