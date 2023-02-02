@@ -43,12 +43,6 @@ def parse_args():
         help="Number of weekdays to submit a timesheet for, use '5' on a monday to submit for the entire week",
     )
     parser.add_argument(
-        "--hours",
-        type=int,
-        default=8,
-        help="Number of hours to submit. Default=8",
-    )
-    parser.add_argument(
         "-n",
         "--notification",
         action="store_true",
@@ -72,13 +66,25 @@ def parse_args():
     parser.add_argument(
         "-t",
         "--task",
-        type=str,
-        default="live",
-        choices=["holiday", "live", "OOO", "training"],
+        action="append",
+        nargs=2,
+        metavar=("task", "hour"),
         help="The type of task for the clockify submission. Specify task name "
-        + "if it is anything other than 'live'. Put the task name (e.g., training, OOO, holiday)",
+        + "if it is anything other than 'live'. Put the task name(idle, training, issue, OOO, holiday).\n"
+        + 'Passing multiple task-hour pair is also acceptable. (E.g. "--task live 4 --task OOO 4" for afternoon OOO.)',
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # postprocessing args
+    logger.debug("Given task and hour pairs : %s", args.task)
+    args.task = [["live", "8"]] if not args.task else args.task  # default value
+    args.task = {task_name: int(hours) for (task_name, hours) in args.task}
+    if sum(args.task.values()) != 8:
+        raise ValueError(
+            "Please make sure that the summation of the hours is equal to 8. "
+            + f"(Given: {sum(args.task.values())} hours)"
+        )
+    return args
 
 
 def run():
@@ -90,9 +96,7 @@ def run():
     config = Config(verbose=args.verbose)
 
     try:
-        clockify = Clockify(
-            config.CLOCKIFY_API_KEY, task=args.task, locale=config.LOCALE
-        )
+        clockify = Clockify(config.CLOCKIFY_API_KEY, locale=config.LOCALE)
 
         # Automate Mode
         if args.automate is not None:
@@ -117,30 +121,35 @@ def run():
         if not assert_start_date(start_date):
             logger.critical("Start date failed sanity check. Aborting program")
             sys.exit(1)
-        dates = get_working_dates(
-            start=start_date, count=args.count, cal=cal, working_hours=args.hours
+        working_dates, holidays = get_working_dates(
+            start=start_date, count=args.count, cal=cal
         )
 
-        if not dates:
-            logger.info(
-                "Submitted dates fall on weekends, form submission is not required."
-            )
-            return
+        logger.info(
+            "Try to submitting %d report(s)... (working days: %s / holidays : %s)",
+            args.count,
+            working_dates,
+            holidays,
+        )
 
-        string_list = [f"{date}: {hours} hours" for (date, hours) in dates]
-        logger.info("Date(s) (yyyy-mm-dd) to be submitted: %s", string_list)
+        for date in working_dates:
+            clockify.submit_clockify(date, args.task, dry_run=args.dry_run)
 
-        for (date, hours) in dates:
-            clockify.submit_clockify(date, working_hours=hours, dry_run=args.dry_run)
+        for date in holidays:
+            clockify.submit_clockify(date, {"holiday": 8}, dry_run=args.dry_run)
 
         # Notification (OSX only)
         if args.notification and sys.platform.lower() == "darwin":
-            if len(dates) == 1:
+            if len(working_dates) == 1:
                 notification_text = (
                     f"Timesheet for {args.start.lower()} is successfully submitted."
                 )
             else:
-                notification_text = f"Timesheets from {dates[0]} to {dates[-1]} are successfully submitted."
+                date_0 = working_dates[0]
+                date_f = working_dates[-1]
+                notification_text = (
+                    f"Timesheets from {date_0} to {date_f} are successfully submitted."
+                )
             if args.dry_run:
                 notification_text = f"[DRY_RUN] {notification_text}"
             os.system(

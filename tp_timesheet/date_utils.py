@@ -8,21 +8,23 @@ from tp_timesheet.config import Config
 
 
 def get_working_dates(
-    start: datetime.date, count: int, cal, working_hours: int
+    start: datetime.date,
+    count: int,
+    cal,
 ) -> List[Tuple[datetime.date, int]]:
     """get workdays from `start` date to `start+count` date"""
     working_dates = []
+    holidays = []
     for i in range(count):
         current_date = start + timedelta(days=i)
         year = current_date.year
-        holidays = cal.holidays(year)
-        holidates = [date for (date, _) in holidays]
+        holidates = [date for (date, _) in cal.holidays(year)]
         if current_date.isoweekday() < 6:
             if current_date not in holidates:
-                working_dates.append((current_date, working_hours))
+                working_dates.append(current_date)
             else:
-                working_dates.append((current_date, 0))  # 0: number of working hours
-    return working_dates
+                holidays.append(current_date)
+    return working_dates, holidays
 
 
 def get_start_date(start_date_arg: str) -> datetime.date:
