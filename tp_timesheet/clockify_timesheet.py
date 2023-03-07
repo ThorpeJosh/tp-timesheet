@@ -13,10 +13,10 @@ class Clockify:
     """Clockify class, contains all methods required to set up and submit entry to clockify"""
 
     task_project_dict = {
-        "live": ("Live hours", "Jupiter Staffing APAC"),
-        "training": ("Training", "Jupiter Staffing APAC"),
-        "OOO": ("Out Of Office", "Jupiter Staffing APAC"),
-        "holiday": ("Holiday", "Jupiter Staffing APAC"),
+        "live": ("Live hours", "NLx"),
+        "training": ("Training", "NLx"),
+        "OOO": ("Out Of Office", "NLx"),
+        "holiday": ("Holiday", "NLx"),
     }
     project_id_cache = {}
     task_id_cache = {}

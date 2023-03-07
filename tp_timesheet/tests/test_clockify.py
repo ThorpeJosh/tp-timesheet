@@ -11,12 +11,12 @@ from tp_timesheet.config import Config
 from .test_config import fixture_create_tmp_clockify_api_config
 
 WORKSPACE_ID = "5fa423e902f38d2ce68f3169"
-PROJECT_ID = "6377ce7d0c7a4c4566b89d41"
+PROJECT_ID = "62fd2e27df8f7e3135ab424f"
 TASK_IDS = [
-    "6377ce9c0c7a4c4566b89ef7",  # Live hours
-    "6377cea7d3400c1c832e48cb",  # Training
-    "63ab0fa9563a041b5b01148a",  # Out Of Office
-    "63ab0fa627acb5055e805c0b",  # Holiday
+    "62ff5d9c5ec87677f07b5675",  # Live hours
+    "636e52d846d859292cb80416",  # Training
+    "63ab0fb70bf68b59badc8b8d",  # Out Of Office
+    "63ab0fb40bf68b59badc8b61",  # Holiday
 ]
 
 
