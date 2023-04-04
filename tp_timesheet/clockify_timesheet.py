@@ -88,7 +88,7 @@ class Clockify:
                 f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/time-entries",
                 headers={"X-Api-Key": self.api_key},
                 json=time_entry_json,
-                timeout=2,
+                timeout=5,
             )
             logger.debug(
                 "POST:  %s\nResponse: %s",
@@ -123,7 +123,7 @@ class Clockify:
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/user/{self.user_id}/time-entries",
             headers={"X-Api-Key": self.api_key},
             params=params,
-            timeout=2,
+            timeout=5,
         )
         response.raise_for_status()
         response_list = json.loads(response.text)
@@ -142,7 +142,7 @@ class Clockify:
             response = requests.delete(
                 f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/time-entries/{entry}",
                 headers={"X-Api-Key": self.api_key},
-                timeout=2,
+                timeout=5,
             )
             response.raise_for_status()
 
@@ -161,7 +161,7 @@ class Clockify:
         get_request = requests.get(
             f"{self.api_base_endpoint}/user",
             headers={"X-Api-Key": self.api_key},
-            timeout=2,
+            timeout=5,
         )
         get_request.raise_for_status()
         request_dict = json.loads(get_request.text)
@@ -185,7 +185,7 @@ class Clockify:
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects",
             headers={"X-Api-Key": self.api_key},
-            timeout=2,
+            timeout=5,
         )
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
@@ -212,7 +212,7 @@ class Clockify:
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/projects/{project_id}/tasks",
             headers={"X-Api-Key": self.api_key},
-            timeout=2,
+            timeout=5,
         )
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
@@ -233,7 +233,7 @@ class Clockify:
         get_request = requests.get(
             f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/tags",
             headers={"X-Api-Key": self.api_key},
-            timeout=2,
+            timeout=5,
         )
         get_request.raise_for_status()
         request_list = json.loads(get_request.text)
