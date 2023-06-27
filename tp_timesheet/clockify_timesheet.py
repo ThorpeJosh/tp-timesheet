@@ -72,7 +72,6 @@ class Clockify:
         time_entry_json = {
             "start": start_timestamp,
             "end": end_timestamp,
-            "billable": True,
             "projectId": project_id,
             "taskId": task_id,
             "tagIds": [self.locale_id],
