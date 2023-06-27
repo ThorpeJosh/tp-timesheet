@@ -72,7 +72,6 @@ class Clockify:
         time_entry_json = {
             "start": start_timestamp,
             "end": end_timestamp,
-            "billable": True,
             "projectId": project_id,
             "taskId": task_id,
             "tagIds": [self.locale_id],
@@ -88,7 +87,7 @@ class Clockify:
                 f"{self.api_base_endpoint}/workspaces/{self.workspace_id}/time-entries",
                 headers={"X-Api-Key": self.api_key},
                 json=time_entry_json,
-                timeout=2,
+                timeout=4,
             )
             logger.debug(
                 "POST:  %s\nResponse: %s",
